@@ -17,6 +17,7 @@
   },
   "devDependencies": {
     "@types/express": "^4.17.21",
+    "@types/jquery": "^3.5.29",
     "@types/node": "^20.11.4",
     "typescript": "^5.3.3"
   }

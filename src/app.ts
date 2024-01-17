@@ -18,6 +18,8 @@ app.use(bodyParser.urlencoded({
   extended: true
 })); // Express modules / packages
 
+app.use(express.static('views'));
+
 app.get('/', async (req, res) => {
   try {
     res.render('html/home');
