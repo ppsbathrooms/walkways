@@ -1,10 +1,6 @@
-// #region Imports & Setup
-const express = require('express');
-const session = require('express-session');
-const bodyParser = require('body-parser');
-const path = require('path');
-
-const fs = require('fs');
+import bodyParser from 'body-parser';
+import path from 'path';
+import express, { Request, Response } from 'express';
 
 const app = express(); // creates app for server's client
 
@@ -24,8 +20,7 @@ app.use(bodyParser.urlencoded({
 
 app.get('/', async (req, res) => {
   try {
-    dataToSendToClient = null;
-    res.render('html/home', { data: dataToSendToClient });
+    res.render('html/home');
   } catch (error) {
     console.error('An error occurred:', error);
     res.status(500).json({ error: 'An error occurred' });
@@ -38,13 +33,13 @@ app.get('*', (req, res) => {
 });
 
 app.route('/reqtypes')
-  .get(function(req, res) {
+  .get((req: Request, res: Response) => {
     res.send('Get');
   })
-  .post(function(req, res) {
+  .post((req: Request, res: Response) => {
     res.send('Post');
   })
-  .put(function(req, res) {
+  .put((req: Request, res: Response) => {
     res.send('Put');
   });
 
@@ -53,7 +48,6 @@ const PORT = process.env.PORT || 42069;
 // thing that works but nobody knows how PLZ DONT TOUCH PLZZZZ
 // i touched it... sorry :(
 // NOOOOOOO
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`server started on port ${PORT}`);
+app.listen(42069, '0.0.0.0', () => {
+  console.log(`server started on port ${42069}`);
 });
-
