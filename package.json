@@ -17,9 +17,14 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
+    "@types/react": "^18.2.48",
+    "@types/react-dom": "^18.2.18",
+    "ejs": "^3.1.9",
     "express": "^4.18.2",
     "express-session": "^1.17.3",
     "passport": "^0.7.0",
-    "passport-google-oauth2": "^0.2.0"
+    "passport-google-oauth2": "^0.2.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   }
 }

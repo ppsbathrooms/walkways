@@ -1,0 +1,60 @@
+:root {
+    --background: #0a0c15;
+    --subtitle: rgba(200, 211, 239, .8);
+    --bgText: #505460;
+    --bgTextHover: #B1BAD6;
+    --buttonHover: #666C7D;
+    --navbar: #24303d;
+}
+
+body {
+    background: var(--background);
+    font-family: monospace;
+    color: #fff;
+}
+
+.navbar {
+    justify-content: space-between;
+    height: 75px;
+    position: absolute;
+    right: 0;
+    left: 0;
+    top: 0;
+}
+
+.signIn {
+    cursor: pointer;
+    width: 100px;
+    height: 40px;
+    border-radius: 10px;
+    margin-right: 20px;
+    border: 1px solid white;
+    transition: 0.1s;
+}
+
+.signIn:hover {
+    color: var(--bgTextHover);
+    transition: 0.1s;
+}
+
+.logo {
+    margin-left: 20px;
+}
+
+.root {
+    margin-top: 125px;
+}
+
+.flex {
+    display: flex;
+}
+
+.fh {
+    display: flex;
+    justify-content: center;
+}
+
+.fv {
+    display: flex;
+    align-items: center;
+}

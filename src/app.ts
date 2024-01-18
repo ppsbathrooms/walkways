@@ -1,6 +1,9 @@
-const express = require('express');
-const passport = require('passport')
+import path from "path";
+import express from 'express';
+import passport from 'passport'
 require('./auth');
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 const session = require('express-session')
 
@@ -10,24 +13,36 @@ function isLoggedIn(req, res, next) {
 
 const app = express();
 app.use(session({
-  secret: 'cat',
+  secret: process.env.SESSION_SECRET,
 }));
+
+app.set('views', path.join(__dirname, 'views'));
+
+app.use(express.static(path.join(__dirname, 'views', 'public')));
+
+app.engine('html', require('ejs').renderFile);
+app.set('view engine', 'html');
+
 
 app.use(passport.initialize());
 app.use(passport.session());
 
-
 app.get('/', (req, res) => {
-    res.send('<a href="/auth/google">google login</a>');
+    const data = {
+        isAuthenticated: req.isAuthenticated(),
+        user: req.user ? { displayName: req.user.displayName, email: req.user.email } : null
+    };
+    res.render('html/home', { data: JSON.stringify(data) });
 });
 
-app.get('/auth/google', 
+
+app.get('/auth/google',
     passport.authenticate('google', { scope: ['email', 'profile']})
 );
 
 app.get('/auth/google/callback',
     passport.authenticate('google', {
-        successRedirect: '/account',
+        successRedirect: '/',
         failureRedirect: '/auth/failure'
     })
 );
@@ -52,6 +67,19 @@ app.get('/logout', (req, res, next) => {
     });
 });
 
+
+// API REQUESTS
+
+app.get('/api/brdata', (req, res) => {
+    // get data from da server
+    const brData = {
+        chs: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,],
+        fhs: [0,1,0,0,0,1,1,0,0,1,0,0,1,0,0,0,1,1,1,1,0,1,0,0,1,0,1,0,1,0],
+        ihs: [1,0,0,1,1,1,0,0,1,0,1,0,1,1,0]
+    }
+    
+    res.json(brData);
+});
 
 const PORT = 42069;
 app.listen(PORT, () => {

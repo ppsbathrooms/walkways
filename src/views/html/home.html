@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/style/style.css">
+    <title>ppsbathrooms | home</title>
+</head>
+
+<body>
+    <div class="navbar fv">
+        <div class="logo">
+            <h1>ppsbathrooms</h1>
+        </div>
+        <div class="flex">
+            <p id="userInfo" style="margin-right: 20px;"></p>
+            <div class="signIn fh fv" id="signInButton">sign in</div>
+            <div class="signIn fh fv" id="signOutButton" style="display: none;">sign out</div>
+        </div>
+    </div>
+    <div class="root">
+        <p id="data"></p>
+        <p id="user"></p>
+    </div>
+</body>
+
+<script>
+    fetch('/api/brdata')
+        .then(response => response.json())
+        .then(data => $('#data').html(JSON.stringify(data)))
+</script>
+
+<script src="/thirdParty/jquery-3.7.1.min.js"></script>
+
+<script>
+    $('#signInButton').on('click', e => {
+        window.location = '/auth/google';
+    })
+
+    $('#signOutButton').on('click', e => {
+        window.location = '/logout';
+    })
+</script>
+
+<script>
+    const { isAuthenticated, user } = JSON.parse('<%- data %>');
+
+    if (isAuthenticated) {
+        $('#signInButton').hide();
+        $('#signOutButton').show();
+        if (user) {
+            $('#userInfo').html(`${user.displayName} - ${user.email}`)
+        }
+    } else {
+        $('#signInButton').show();
+        $('#signOutButton').hide();
+    }
+
+    fetch('/api/brdata')
+        .then(response => response.json())
+        .then(data => $('#data').html(JSON.stringify(data)));
+</script>
+
+</html>
