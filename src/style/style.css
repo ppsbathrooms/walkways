@@ -1,0 +1,18 @@
+:root {
+  --background: #0b0c14;
+}
+
+body {
+  background: var(--background);
+  font-family: monospace;
+  color: #fff;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+}
+
+.navbar {
+  margin-left: auto;
+}
