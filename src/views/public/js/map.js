@@ -3,14 +3,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const mapContent = document.getElementById('map-content');
     let isDragging = false;
     let offset = { x: 0, y: 0 };
-    let currentTransform = { x: 0, y: 0, scale: 1 };
 
+    let currentTransform = { x: -910, y: -940, scale: 1 };
+    updateTransform();
+    
     mapContent.addEventListener('mousedown', startDragging);
     mapContent.addEventListener('mousemove', drag);
     document.addEventListener('mouseup', stopDragging);
     mapContent.addEventListener('wheel', zoom);
 
     function startDragging(e) {
+        if ($('#map').css('cursor') !== 'grabbing') {
+            $('#map').css('cursor', 'grabbing');
+        }
         offset = {
             x: e.clientX - currentTransform.x,
             y: e.clientY - currentTransform.y
@@ -31,19 +36,18 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function stopDragging() {
+        $('#map').css('cursor', 'grab');
         isDragging = false;
     }
 
     function zoom(e) {
         e.preventDefault();
     
-        const zoomSpeed = 0.02;
+        const zoomSpeed = 0.1;
     
         const containerRect = map.getBoundingClientRect();
         const mouseX = e.clientX - window.innerWidth/2;
         const mouseY = e.clientY - window.innerHeight/2;
-
-        console.log(mouseX + " " + mouseY);
     
         let newScale = currentTransform.scale;
     
@@ -53,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
             newScale -= zoomSpeed;
         }
     
-        newScale = Math.max(0.1, Math.min(5, newScale));
+        newScale = Math.max(0.3, Math.min(5, newScale));
     
         currentTransform.x -= (mouseX - currentTransform.x) * (newScale - currentTransform.scale) / currentTransform.scale;
         currentTransform.y -= (mouseY - currentTransform.y) * (newScale - currentTransform.scale) / currentTransform.scale;

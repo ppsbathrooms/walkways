@@ -11,7 +11,7 @@ body {
   background: var(--background);
   font-family: monospace;
   color: #fff;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 .navbar {
@@ -75,6 +75,7 @@ body {
 }
 
 #map {
+  transition: 0.4s ease-out;
   user-select: none;
   cursor: grab;
   width: 100%;
@@ -85,4 +86,13 @@ body {
   width: 100px;
   height: 100px;
   background: rgb(46, 46, 46);
+}
+
+#map img {
+  user-drag: none;
+  -webkit-user-drag: none;
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
 }
