@@ -21,19 +21,25 @@
     </div>
     <div class="root">
         <p id="data"></p>
-        <p id="user"></p>
+        <div id="map-holder" class="fh">
+            <div id="map-content">
+                <div id="map">
+                    <div>
+                        <div class="building fh fv" style="margin-left: 1000px; margin-top: 300px;">building 1</div>
+                        <div class="building fh fv" style="margin-left: 750px; margin-top: 100px;">building 2</div>
+                        <div class="building fh fv" style="margin-left: 250px; margin-top: -350px;">building 3</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </body>
 
 <script>
     fetch('/api/brdata')
         .then(response => response.json())
-        .then(data => $('#data').html(JSON.stringify(data)))
-</script>
+        .then(data => $('#data').html(JSON.stringify(data)));
 
-<script src="/thirdParty/jquery-3.7.1.min.js"></script>
-
-<script>
     $('#signInButton').on('click', e => {
         window.location = '/auth/google';
     })
@@ -41,9 +47,7 @@
     $('#signOutButton').on('click', e => {
         window.location = '/logout';
     })
-</script>
 
-<script>
     const { isAuthenticated, user } = JSON.parse('<%- data %>');
 
     if (isAuthenticated) {
@@ -56,10 +60,9 @@
         $('#signInButton').show();
         $('#signOutButton').hide();
     }
-
-    fetch('/api/brdata')
-        .then(response => response.json())
-        .then(data => $('#data').html(JSON.stringify(data)));
 </script>
+
+<script src="/js/map.js"></script>
+<script src=" /thirdParty/jquery-3.7.1.min.js"></script>
 
 </html>
