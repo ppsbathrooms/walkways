@@ -96,3 +96,15 @@ body {
   -webkit-user-select: none;
   -ms-user-select: none;
 }
+
+#test-building {
+  background-color: red;
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: 300px;
+  margin-left: 300px;
+  width: 100px;
+  height: 100px;
+}

@@ -1,66 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/style/style.css">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/style/style.css" />
     <script src=" /thirdParty/jquery-3.7.1.min.js"></script>
     <title>ppsbathrooms | home</title>
-</head>
+  </head>
 
-<body>
+  <body>
     <div class="navbar fv">
-        <div class="logo">
-            <h1>ppsbathrooms</h1>
+      <div class="logo">
+        <h1>ppsbathrooms</h1>
+      </div>
+      <div class="flex">
+        <p id="userInfo" style="margin-right: 20px"></p>
+        <div class="signIn fh fv" id="signInButton">sign in</div>
+        <div class="signIn fh fv" id="signOutButton" style="display: none">
+          sign out
         </div>
-        <div class="flex">
-            <p id="userInfo" style="margin-right: 20px;"></p>
-            <div class="signIn fh fv" id="signInButton">sign in</div>
-            <div class="signIn fh fv" id="signOutButton" style="display: none;">sign out</div>
-        </div>
+      </div>
     </div>
     <div class="root">
-        <p style="display: none" id="data"></p>
-        <div id="map-holder" class="fh">
-            <div id="map-content">
-                <div id="map" style="transform: translate(-910px, -940px) scale(1);">
-                    <div>
-                        <img src="/maps/franklin.svg" alt="franklin's map">
-                    </div>
-                </div>
+      <p style="display: none" id="data"></p>
+      <div id="map-holder" class="fh">
+        <div id="map-content">
+          <div id="map" style="transform: translate(-910px, -940px) scale(1)">
+            <div>
+              <img src="/maps/franklin.svg" alt="franklin's map" />
             </div>
+            <div id="test-building"></div>
+          </div>
         </div>
+      </div>
     </div>
-</body>
+  </body>
 
-<script>
-    fetch('/api/brdata')
-        .then(response => response.json())
-        .then(data => $('#data').html(JSON.stringify(data)));
+  <script>
+    fetch("/api/brdata")
+      .then((response) => response.json())
+      .then((data) => $("#data").html(JSON.stringify(data)));
 
-    $('#signInButton').on('click', e => {
-        window.location = '/auth/google';
-    })
+    $("#signInButton").on("click", (e) => {
+      window.location = "/auth/google";
+    });
 
-    $('#signOutButton').on('click', e => {
-        window.location = '/logout';
-    })
+    $("#signOutButton").on("click", (e) => {
+      window.location = "/logout";
+    });
 
-    const { isAuthenticated, user } = JSON.parse('<%- data %>');
+    const { isAuthenticated, user } = JSON.parse("<%- data %>");
 
     if (isAuthenticated) {
-        $('#signInButton').hide();
-        $('#signOutButton').show();
-        if (user) {
-            $('#userInfo').html(`${user.displayName} - ${user.email}`)
-        }
+      $("#signInButton").hide();
+      $("#signOutButton").show();
+      if (user) {
+        $("#userInfo").html(`${user.displayName} - ${user.email}`);
+      }
     } else {
-        $('#signInButton').show();
-        $('#signOutButton').hide();
+      $("#signInButton").show();
+      $("#signOutButton").hide();
     }
-</script>
+  </script>
 
-<script src="/js/map.js"></script>
-
+  <script src="/js/map.js"></script>
 </html>
