@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function updateBuildings() {
         const area = calcScreenPercentage(testBuilding);
-        if (area > 0.1)
+        if (area > 0.01)
             testBuilding.style.backgroundColor = '#ff0000';
         else 
             testBuilding.style.backgroundColor = '#000000';
