@@ -8,7 +8,8 @@ dotenv.config();
 const session = require('express-session')
 
 function isLoggedIn(req, res, next) {
-    req.user ? next() : res.sendStatus(401);
+    next();
+    // req.user ? next() : res.redirect('/auth/google');
 }
 
 const app = express();
@@ -52,7 +53,7 @@ app.get('/auth/failure', (req, res) => {
 });
 
 app.get('/account', isLoggedIn, (req, res) => {
-    res.send(`<p>${req.user.displayName}'s account</p>`)
+    res.render(`html/account`)
 });
 
 app.get('/logout', (req, res, next) => {

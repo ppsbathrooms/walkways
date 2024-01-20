@@ -1,12 +1,17 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const map = document.getElementById('map');
-    const mapContent = document.getElementById('map-content');
-    const testBuilding = document.getElementById('test-building');
+const map = document.getElementById('map');
+const mapContent = document.getElementById('map-content');
+const testBuilding = document.getElementById('test-building');
 
+let currentTransform = { x: 0, y: 0, scale: 1 };
+
+const navZoomScale = 0.2;
+const navZoomMin = 0.3;
+const navZoomMax = 5;
+
+document.addEventListener('DOMContentLoaded', function() {
     let isDragging = false;
     let offset = { x: 0, y: 0 };
 
-    let currentTransform = { x: -910, y: -940, scale: 1 };
     updateTransform();
     
     mapContent.addEventListener('mousedown', startDragging);
@@ -58,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
             newScale -= zoomSpeed;
         }
     
-        newScale = Math.max(0.3, Math.min(5, newScale));
+        newScale = Math.max(navZoomMin, Math.min(navZoomMax, newScale));
     
         currentTransform.x -= (mouseX - currentTransform.x) * (newScale - currentTransform.scale) / currentTransform.scale;
         currentTransform.y -= (mouseY - currentTransform.y) * (newScale - currentTransform.scale) / currentTransform.scale;
@@ -67,51 +72,69 @@ document.addEventListener('DOMContentLoaded', function() {
     
         updateTransform();
     }
+});
 
-    function updateTransform() {
-        map.style.transform = `translate(${currentTransform.x}px, ${currentTransform.y}px) scale(${currentTransform.scale})`;
-        updateBuildings();
-    }
+function updateTransform() {
+    map.style.transform = `translate(${currentTransform.x}px, ${currentTransform.y}px) scale(${currentTransform.scale})`;
+    updateBuildings();
+}
 
-    function updateBuildings() {
+function updateBuildings() {
+    if(testBuilding) {
         const area = calcScreenPercentage(testBuilding);
         if (area > 0.01)
             testBuilding.style.backgroundColor = '#ff0000';
         else 
             testBuilding.style.backgroundColor = '#000000';
     }
+}
 
-    // percentage of the screen taken up by a div
-    function calcScreenPercentage(divElement) {
-        // screen dimensions
-        let viewportWidth = window.innerWidth || document.documentElement.clientWidth;
-        let viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+// percentage of the screen taken up by a div
+function calcScreenPercentage(divElement) {
+    // screen dimensions
+    let viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+    let viewportHeight = window.innerHeight || document.documentElement.clientHeight;
 
-        // kinda scuffed but seems to work so not gonna fuck with it
+    // kinda scuffed but seems to work so not gonna fuck with it
 
-        let rect = divElement.getBoundingClientRect();
+    let rect = divElement.getBoundingClientRect();
 
-        let x1 = rect.x;
-        let y1 = rect.y;
+    let x1 = rect.x;
+    let y1 = rect.y;
 
-        let x2 = x1 + rect.width;
-        let y2 = y1 + rect.height;
+    let x2 = x1 + rect.width;
+    let y2 = y1 + rect.height;
 
-        // clamp to be in screen view
-        x1 = clamp(x1, 0, viewportWidth);
-        y1 = clamp(y1, 0, viewportHeight);
-        x2 = clamp(x2, 0, viewportWidth);
-        y2 = clamp(y2, 0, viewportHeight);
+    // clamp to be in screen view
+    x1 = clamp(x1, 0, viewportWidth);
+    y1 = clamp(y1, 0, viewportHeight);
+    x2 = clamp(x2, 0, viewportWidth);
+    y2 = clamp(y2, 0, viewportHeight);
 
-        let onScreenRectWidth = x2 - x1;
-        let onScreenRectHeight = y2 - y1;
+    let onScreenRectWidth = x2 - x1;
+    let onScreenRectHeight = y2 - y1;
 
-        // calc percentage
-        let areaPercentage = ((onScreenRectWidth * onScreenRectHeight) / (viewportWidth * viewportHeight));
-        return areaPercentage;
-    }
+    // calc percentage
+    let areaPercentage = ((onScreenRectWidth * onScreenRectHeight) / (viewportWidth * viewportHeight));
+    return areaPercentage;
+}
 
-    function clamp(num, min, max) {
-        return Math.min(Math.max(num, min), max);
-    };
-});
+function clamp(num, min, max) {
+    return Math.min(Math.max(num, min), max);
+};
+
+
+$('#nav-home').on('click', e => {
+    currentTransform = { x: 0, y: 0, scale: 1 };
+    updateTransform();
+})
+
+$('#nav-plus').on('click', e => {
+    currentTransform.scale = Math.max(navZoomMin, Math.min(navZoomMax, currentTransform.scale + navZoomScale));
+    updateTransform();
+})
+
+$('#nav-minus').on('click', e => {
+    currentTransform.scale = Math.max(navZoomMin, Math.min(navZoomMax, currentTransform.scale - navZoomScale));
+    updateTransform();
+})

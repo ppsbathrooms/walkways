@@ -5,31 +5,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/style/style.css">
+    <script src="/thirdParty/jquery-3.7.1.min.js"></script>
     <title>ppsbathrooms | account</title>
 </head>
 
 <body>
-    <div class="navbar fv">
-        <h1>ppsbathrooms</h1>
-        <div class="signIn fh fv">sign in</div>
-    </div>
+    <div class="header"></div>
+
     <div class="root">
-        <h2 id="data"></h2>
+
     </div>
 </body>
 
-<script>
-    fetch('/api/brdata')
-        .then(response => response.json())
-        .then(data => $('#data').html(JSON.stringify(data)))
-</script>
-
-<script src="/thirdParty/jquery-3.7.1.min.js"></script>
-
-<script>
-    $('.signIn').on('click', e => {
-        window.location = '/auth/google';
-    })
-</script>
+<script src="/js/header.js"></script>
 
 </html>

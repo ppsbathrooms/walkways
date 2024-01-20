@@ -42,6 +42,10 @@ body {
   margin-left: 20px;
 }
 
+.logo h1 {
+  cursor: pointer;
+}
+
 .root {
   margin-top: 125px;
 }
@@ -65,7 +69,7 @@ body {
 }
 
 #map-content {
-  background-color: #5a5a5a;
+  background-color: #181b1c;
   width: 100vw;
   height: 100vh;
   position: absolute;
@@ -107,4 +111,60 @@ body {
   margin-left: 300px;
   width: 100px;
   height: 100px;
+}
+
+.hide {
+  display: none;
+}
+
+.nav-buttons, .nav-schools {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  bottom: 20px;
+}
+
+.nav-buttons {
+  right: 20px;
+}
+
+.nav-schools {
+  display: none;
+  right: 10px;
+  top: 70px;
+  bottom: auto;
+}
+
+.nav-buttons img,
+.nav-schools img {
+  cursor: pointer;
+  width: 20px;
+  padding: 10px;
+  aspect-ratio: 1;
+}
+
+.nav-schools img {
+  width: 40px;
+}
+
+.nav-buttons img:hover,
+.nav-schools img:hover {
+  transition: 0.2s;
+  filter: brightness(70%);
+}
+
+#settings-icon {
+  margin-right: 20px;
+  width: 20px;
+}
+
+.icon {
+  aspect-ratio: 1;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.icon:hover {
+  transition: 0.2s;
+  filter: brightness(70%);
 }
