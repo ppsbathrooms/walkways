@@ -82,7 +82,7 @@ body {
 }
 
 #map {
-  transition: 0.4s ease-out;
+  transition: 0.4s linear;
   user-select: none;
   cursor: grab;
   width: 100%;
@@ -212,4 +212,37 @@ body {
 
 #sidebar-close-button {
   display: none;
+}
+#user-photo {
+  width: 32px;
+  height: 32px;
+  border-radius: 100%;
+  margin-right: 20px;
+  border: 2px solid transparent;
+  transition: 0.2s;
+  display: none;
+}
+
+#user-photo:hover {
+  border: 2px solid white;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+#user-dropdown {
+  position: fixed;
+  right: 20px;
+  border-radius: 10px;
+  top: 60px;
+  width: fit-content;
+  margin-left: 20px;
+  height: fit-content;
+  background: var(--background);
+  padding: 5px;
+  display: none;
+}
+
+#user-dropdown p {
+  margin: 10px 20px;
+  cursor: pointer;
 }

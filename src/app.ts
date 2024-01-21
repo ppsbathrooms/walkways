@@ -31,7 +31,7 @@ app.use(passport.session());
 app.get('/', (req, res) => {
     const data = {
         isAuthenticated: req.isAuthenticated(),
-        user: req.user ? { displayName: req.user.displayName, email: req.user.email } : null
+        user: req.user ? { displayName: req.user.displayName, email: req.user.email, photo: req.user.photos[0].value } : null
     };
     res.render('html/home', { data: JSON.stringify(data) });
 });
