@@ -1,7 +1,7 @@
 $('.header').html(
 `<div class="navbar fv">
     <div class="logo">
-        <h1>ppsbathrooms</h1>
+        <h1>Walkways</h1>
     </div>
     <div class="flex fv">
         <div class="signIn fh fv" id="sign-in-button">sign in</div>
@@ -14,7 +14,7 @@ $('.header').html(
 </div>`);
 
 $('#settings-button').on('click', e => {
-    alert('cool settings page woohoo')
+    showSettings();
 })
 
 $("#sign-in-button").on("click", (e) => {
@@ -30,15 +30,13 @@ $(".logo").on("click", (e) => {
         window.location = "/";
 });
 
-const { isAuthenticated, user } = JSON.parse($('#data').html());
+const user = JSON.parse($('#data').html());
 
-if (isAuthenticated) {
+if (user != null) {
   $("#sign-in-button").hide();
-  if (user) {
     $("#user-info").html(`${user.displayName} - ${user.email}`);
-    $("#user-photo").attr("src",user.photo);
+    $("#user-photo").attr("src", user.picture);
     $('#user-photo').fadeIn(100);
-}
 } else {
   $("#sign-in-button").show();
 }
