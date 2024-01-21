@@ -199,7 +199,8 @@ body {
   place-items: center;
   transform: translateY(50%);
   margin-left: -60px;
-  background: #24303d;
+  background: #24303d99;
+  backdrop-filter: blur(5px);
   border: none;
   color: white;
   border-radius: 10px 0 0 10px;
