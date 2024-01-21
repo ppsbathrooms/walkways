@@ -14,61 +14,48 @@
 
 <body>
   <div id="content-fade"></div> <!-- makes everything darker for popups and stuufs -->
+  <div class="settingsHolder"></div>
 
   <div class="header"></div>
-  <div class="settingsHolder"></div>
+
+  <div class="sidebar">
+    <button class="sidebar-toggle">
+      <span class="material-symbols-outlined" id="sidebar-open-button">
+        keyboard_double_arrow_left
+      </span>
+      <span class="material-symbols-outlined" id="sidebar-close-button">
+        keyboard_double_arrow_right
+      </span>
+    </button>
+    <div class="sidebar-content" id="sidebar-content">Epic sidebar</div>
+  </div>
 
   <div class="root">
     <div class="nav-buttons">
-      <img id="nav-home" src="/style/icons/home.svg" alt="home">
-      <img id="nav-plus" src="/style/icons/plus.svg" alt="plus">
-      <img id="nav-minus" src="/style/icons/minus.svg" alt="minus">
+      <img id="nav-home" src="/style/icons/home.svg" alt="home" />
+      <img id="nav-plus" src="/style/icons/plus.svg" alt="plus" />
+      <img id="nav-minus" src="/style/icons/minus.svg" alt="minus" />
     </div>
     <div class="nav-schools">
-      <img id="nav-cleveland" src="/style/images/clevelandLogo.png" alt="cleveland's logo">
-      <img id="nav-franklin" src="/style/images/franklinLogo.png" alt="franklin's logo">
-
-      <body>
-        <div class="header"></div>
-
-        <div class="sidebar">
-          <button class="sidebar-toggle">
-            <span class="material-symbols-outlined" id="sidebar-open-button">
-              keyboard_double_arrow_left
-            </span>
-            <span class="material-symbols-outlined" id="sidebar-close-button">
-              keyboard_double_arrow_right
-            </span>
-          </button>
-          <div class="sidebar-content" id="sidebar-content">Epic sidebar</div>
+      <img id="nav-cleveland" src="/style/images/clevelandLogo.png" alt="cleveland's logo" />
+      <img id="nav-franklin" src="/style/images/franklinLogo.png" alt="franklin's logo" />
+    </div>
+    <p style="display: none" id="br-data"></p>
+    <div id="map-holder" class="fh">
+      <div id="map-content">
+        <div id="map" class="fh fv">
+          <div>
+            <!-- <img id="cleveland-base-map" src="/maps/cleveland.svg" alt="cleveland's map" style="margin-top: 150px;" /> -->
+            <img id="franklin-base-map" src="/maps/franklin.svg" alt="franklin's map"
+              style="margin-left: 200px; margin-bottom: 100px" />
+          </div>
+          <!-- <div id="test-building"></div> -->
         </div>
-
-        <div class="root">
-          <div class="nav-buttons">
-            <img id="nav-home" src="/style/icons/home.svg" alt="home" />
-            <img id="nav-plus" src="/style/icons/plus.svg" alt="plus" />
-            <img id="nav-minus" src="/style/icons/minus.svg" alt="minus" />
-          </div>
-          <div class="nav-schools">
-            <img id="nav-cleveland" src="/style/images/clevelandLogo.png" alt="cleveland's logo" />
-            <img id="nav-franklin" src="/style/images/franklinLogo.png" alt="franklin's logo" />
-          </div>
-          <p style="display: none" id="br-data"></p>
-          <div id="map-holder" class="fh">
-            <div id="map-content">
-              <div id="map" class="fh fv">
-                <div>
-                  <!-- <img id="cleveland-base-map" src="/maps/cleveland.svg" alt="cleveland's map" style="margin-top: 150px;" /> -->
-                  <img id="franklin-base-map" src="/maps/franklin.svg" alt="franklin's map"
-                    style="margin-left: 200px; margin-bottom: 100px" />
-                </div>
-                <!-- <div id="test-building"></div> -->
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="hide" id="data"><%- data %></div>
-      </body>
+      </div>
+    </div>
+  </div>
+  <div class="hide" id="data"><%- data %></div>
+</body>
 </body>
 
 <script src="/js/map.js"></script>
