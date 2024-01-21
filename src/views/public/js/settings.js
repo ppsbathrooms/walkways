@@ -5,7 +5,6 @@ var options = [
         <h1>Settings</h1>
         <p>Prefered Name: ${user ? user.given_name: ''}</p>
         <p>Email: ${user ? user.email : ''}</p>
-        <div id="close-settings-button"><p>Save</p></div>
         `
     },
     {
@@ -27,7 +26,7 @@ navbar = formattedOptions.map((option, index) => `<p class="navbar-option" data-
 
 settingsPanels = formattedOptions.map(option => {
     const optionObj = options.find(opt => opt.name.replace(/\s+/g, '-') === option);
-    return `<div id="account-${option}" class="settingsPanel ">${optionObj.content}</div>`;
+    return `<div id="account-${option}" class="settingsPanel ">${optionObj.content}<div id="close-settings-button"><p>Save</p></div></div>`;
 }).join('');
 
 $('.settingsHolder').html(

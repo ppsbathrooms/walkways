@@ -23,7 +23,7 @@
     position: absolute;
     top: 0;
     width: 200px;
-    height: 100%;
+    height: calc(100% - 5px);
     border-right: 1px solid #fff;
 }
 
