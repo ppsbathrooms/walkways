@@ -79,7 +79,7 @@ body {
 }
 
 #map {
-  transition: 0.4s ease-out;
+  transition: 0.4s linear;
   user-select: none;
   cursor: grab;
   width: 100%;
