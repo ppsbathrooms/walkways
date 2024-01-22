@@ -1,5 +1,6 @@
 :root {
   --background: #0a0c15;
+  --mapBg: #181b1c;
   --subtitle: rgba(200, 211, 239, 0.8);
   --bgText: #505460;
   --bgTextHover: #b1bad6;
@@ -8,7 +9,7 @@
 }
 
 body {
-  background: var(--background);
+  background: var(--mapBg);
   font-family: monospace;
   color: #fff;
   overflow: hidden;
@@ -79,7 +80,7 @@ body {
 }
 
 #map {
-  transition: 0.4s linear;
+  transition: 0.05s linear;
   user-select: none;
   cursor: grab;
   width: 100%;
@@ -236,7 +237,7 @@ body {
   position: fixed;
   right: 20px;
   border-radius: 10px;
-  top: 50px;
+  top: 60px;
   width: fit-content;
   margin-left: 20px;
   height: fit-content;
@@ -285,4 +286,14 @@ body {
 .map-label {
   cursor: pointer;
   font-size: 50px;
+}
+
+#map-canvas {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+
+  z-index: -1;
 }

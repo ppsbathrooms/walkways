@@ -1,1 +1,1 @@
-#college-map-thing
+walkways

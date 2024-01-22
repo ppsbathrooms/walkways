@@ -1,168 +1,144 @@
-const map = document.getElementById('map');
-const mapContent = document.getElementById('map-content');
-const testBuilding = document.getElementById('test-building');
+$(document).ready(() => {
+    const canvas = $('#map-canvas')[0];
+    const ctx = canvas.getContext('2d');
 
-const zeroPos = {
-    franklin: { x: -89, y: 187, scale: 0.5 }
-}
-const labels = [
-    {
-        map: 'franklin',
-        name: 'franklin',
-        position: { x: -20, y: 0, scale: 1 }
-    },
-    {
-        map: 'franklin',
-        name: 'atkinson',
-        position: { x: -610, y: 982, scale: 1.2 }
-    },
-    {
-        map: 'franklin',
-        name: 'gym',
-        position: { x: -287, y: 666, scale: 1.3 }
-    }
-]
+    const svgFile = '/maps/franklin.svg';
+    const img = new Image();
+    img.src = svgFile;
 
-let currentTransform = zeroPos.franklin;
+    let scale = 1;
+    let redrawScheduled = false;
+    let translation = { x: 0, y: 0 };
 
-const navZoomScale = 0.2;
-const navZoomMin = 0.3;
-const navZoomMax = 5;
+    const navZoomMin = 0.45;
+    const navZoomMax = 2.0;
 
-document.addEventListener('DOMContentLoaded', function() {
-    let isDragging = false;
-    let offset = { x: 0, y: 0 };
+    // update canvas size to window size
+    function updateCanvasSize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
 
-    updateTransform();
-    
-    mapContent.addEventListener('mousedown', startDragging);
-    mapContent.addEventListener('mousemove', drag);
-    document.addEventListener('mouseup', stopDragging);
-    mapContent.addEventListener('wheel', zoom);
-
-    function startDragging(e) {
-        if ($('#map').css('cursor') !== 'grabbing') {
-            $('#map').css('cursor', 'grabbing');
-        }
-        offset = {
-            x: e.clientX - currentTransform.x,
-            y: e.clientY - currentTransform.y
+        // recalc translation to keep map centered
+        translation = {
+            x: canvas.width / 2 - (scale * img.width) / 2,
+            y: canvas.height / 2 - (scale * img.height) / 2
         };
-        
-        isDragging = true;        
+        scheduleRedraw();
     }
 
-    function drag(e) {
-        if (isDragging) {
-            const x = e.clientX - offset.x;
-            const y = e.clientY - offset.y;
-            
-            currentTransform = { x, y, scale: currentTransform.scale };
-
-            updateTransform();
+    // schedule redraw for smoother rendering
+    function scheduleRedraw() {
+        if (!redrawScheduled) {
+            redrawScheduled = true;
+            requestAnimationFrame(drawMap);
         }
     }
 
-    function stopDragging() {
-        $('#map').css('cursor', 'grab');
-        isDragging = false;
+    window.addEventListener('resize', updateCanvasSize);
+
+    // draw map on the canvas
+    function drawMap() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.setTransform(scale, 0, 0, scale, translation.x, translation.y);
+        ctx.drawImage(img, 0, 0, img.width, img.height);
+        ctx.setTransform(1, 0, 0, 1, 0, 0); // reset transform to stop weird edge trails
+        redrawScheduled = false;
     }
 
-    function zoom(e) {
-        e.preventDefault();
-    
-        const zoomSpeed = 0.1;
-    
-        const mouseX = e.clientX - window.innerWidth/2;
-        const mouseY = e.clientY - window.innerHeight/2;
-    
-        let newScale = currentTransform.scale;
-    
-        if (e.deltaY < 0) {
-            newScale += zoomSpeed;
-        } else {
-            newScale -= zoomSpeed;
+    img.onload = () => {
+        updateCanvasSize(); // set initial canvas size
+
+        let isDragging = false;
+        let startCoords = { x: 0, y: 0 };
+
+        // panning and zoomin
+        canvas.addEventListener('mousedown', startDrag);
+        canvas.addEventListener('mousemove', drag);
+        document.addEventListener('mouseup', endDrag);
+        canvas.addEventListener('wheel', zoom);
+
+        function startDrag(e) {
+            isDragging = true;
+            startCoords = { x: e.clientX, y: e.clientY };
+            scheduleRedraw();
         }
-    
-        newScale = Math.max(navZoomMin, Math.min(navZoomMax, newScale));
-    
-        currentTransform.x -= (mouseX - currentTransform.x) * (newScale - currentTransform.scale) / currentTransform.scale;
-        currentTransform.y -= (mouseY - currentTransform.y) * (newScale - currentTransform.scale) / currentTransform.scale;
-    
-        currentTransform = { x: currentTransform.x, y: currentTransform.y, scale: newScale };
-    
-        updateTransform();
-    }
+
+        function drag(e) {
+            if (!isDragging) return;
+            const dx = e.clientX - startCoords.x;
+            const dy = e.clientY - startCoords.y;
+            translation.x += dx;
+            translation.y += dy;
+            startCoords = { x: e.clientX, y: e.clientY };
+            scheduleRedraw();
+        }
+
+        function endDrag() {
+            isDragging = false;
+        }
+
+        // zoomin
+        function zoom(e) {
+            const scaleFactor = e.deltaY > 0 ? 0.9 : 1.1;
+            // calc new scale
+            const newScale = Math.max(navZoomMin, Math.min(navZoomMax, scale * scaleFactor));
+
+            if (newScale === navZoomMin || newScale === navZoomMax) {
+                return; // do nothing at scale limits
+            }
+
+            const cursor = getCursorPosition(e);
+            // calc the adjustment to keep the cursor fixed
+            const adjustX = cursor.x - translation.x;
+            const adjustY = cursor.y - translation.y;
+
+            // update translation and scale
+            translation.x = cursor.x - adjustX * newScale / scale;
+            translation.y = cursor.y - adjustY * newScale / scale;
+            scale = newScale;
+
+            scheduleRedraw();
+        }
+
+        // get cursor position relative to canvas
+        function getCursorPosition(e) {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            return { x, y };
+        }
+
+        $('#nav-home').on('click', e => {
+            translation = { x: 0, y: 0 };
+            scale = 1;
+            updateCanvasSize();
+            scheduleRedraw();
+        });
+
+        $('#nav-plus').on('click', e => {
+            const scaleFactor = 1.1;
+            const cursor = { x: canvas.width / 2, y: canvas.height / 2 };
+            const newScale = Math.max(navZoomMin, Math.min(navZoomMax, scale * scaleFactor));
+
+            translation.x = cursor.x - (cursor.x - translation.x) * newScale / scale;
+            translation.y = cursor.y - (cursor.y - translation.y) * newScale / scale;
+            scale = newScale;
+
+            scheduleRedraw();
+        });
+
+        $('#nav-minus').on('click', e => {
+            const scaleFactor = 0.9;
+            const cursor = { x: canvas.width / 2, y: canvas.height / 2 };
+            const newScale = Math.max(navZoomMin, Math.min(navZoomMax, scale * scaleFactor));
+
+            translation.x = cursor.x - (cursor.x - translation.x) * newScale / scale;
+            translation.y = cursor.y - (cursor.y - translation.y) * newScale / scale;
+            scale = newScale;
+
+            scheduleRedraw();
+        });
+
+        drawMap(); // initial drawing
+    };
 });
-
-function updateTransform() {
-    map.style.transform = `translate(${currentTransform.x}px, ${currentTransform.y}px) scale(${currentTransform.scale})`;
-    updateBuildings();
-}
-
-function updateBuildings() {
-    if(testBuilding) {
-        const area = calcScreenPercentage(testBuilding);
-        if (area > 0.01)
-            testBuilding.style.backgroundColor = '#ff0000';
-        else 
-            testBuilding.style.backgroundColor = '#000000';
-    }
-}
-
-// percentage of the screen taken up by a div
-function calcScreenPercentage(divElement) {
-    // screen dimensions
-    let viewportWidth = window.innerWidth || document.documentElement.clientWidth;
-    let viewportHeight = window.innerHeight || document.documentElement.clientHeight;
-
-    // kinda scuffed but seems to work so not gonna fuck with it
-
-    let rect = divElement.getBoundingClientRect();
-
-    let x1 = rect.x;
-    let y1 = rect.y;
-
-    let x2 = x1 + rect.width;
-    let y2 = y1 + rect.height;
-
-    // clamp to be in screen view
-    x1 = clamp(x1, 0, viewportWidth);
-    y1 = clamp(y1, 0, viewportHeight);
-    x2 = clamp(x2, 0, viewportWidth);
-    y2 = clamp(y2, 0, viewportHeight);
-
-    let onScreenRectWidth = x2 - x1;
-    let onScreenRectHeight = y2 - y1;
-
-    // calc percentage
-    let areaPercentage = ((onScreenRectWidth * onScreenRectHeight) / (viewportWidth * viewportHeight));
-    return areaPercentage;
-}
-
-function clamp(num, min, max) {
-    return Math.min(Math.max(num, min), max);
-};
-
-
-$('#nav-home').on('click', e => {
-    currentTransform = zeroPos.franklin;
-    updateTransform();
-})
-
-$('#nav-plus').on('click', e => {
-    currentTransform.scale = Math.max(navZoomMin, Math.min(navZoomMax, currentTransform.scale + navZoomScale));
-    updateTransform();
-})
-
-$('#nav-minus').on('click', e => {
-    currentTransform.scale = Math.max(navZoomMin, Math.min(navZoomMax, currentTransform.scale - navZoomScale));
-    updateTransform();
-})
-
-labels.forEach((label) => {
-    $(`#${label.map}-${label.name}-label`).on('click', e => {
-        currentTransform = label.position;
-        updateTransform();
-    })
-})

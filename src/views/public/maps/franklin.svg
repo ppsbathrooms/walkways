@@ -2,7 +2,7 @@
 <svg width="2814pt" height="2038pt" version="1.2" viewBox="0 0 1407 1019" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <filter id="a" x="-.070184" y="-.097817" width="1.1404" height="1.1956" color-interpolation-filters="sRGB">
-      <feGaussianBlur result="blur" stdDeviation="40 40"/>
+      <feGaussianBlur result="blur" stdDeviation="10 10"/>
     </filter>
     <mask id="e" maskUnits="userSpaceOnUse">
       <rect transform="matrix(.88947 0 0 .86702 77.698 68.477)" x="19.079" y="24.245" width="1367.8" height="981.43" ry="79.787" fill="#fff" filter="url(#a)" stroke-width=".375"/>
