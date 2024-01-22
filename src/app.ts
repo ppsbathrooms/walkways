@@ -65,7 +65,6 @@ app.get('/logout', (req, res, next) => {
     });
 });
 
-
 // API REQUESTS
 
 app.get('/api/brdata', (req, res) => {
@@ -77,6 +76,13 @@ app.get('/api/brdata', (req, res) => {
     }
     
     res.json(brData);
+});
+
+
+
+// 404
+app.get('*', (req, res) => {
+  res.status(404).render('html/404.html');
 });
 
 const PORT = 42069;

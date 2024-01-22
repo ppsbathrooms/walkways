@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Walkways | 404</title>
+    <script src="/thirdParty/jquery-3.7.1.min.js"></script>
+</head>
+
+<style>
+    body {
+        background: #0a0c15;
+        display: flex;
+        justify-content: center;
+    }
+
+    .toilet-icon {
+        margin-top: 40px;
+        width: auto;
+    }
+
+    .container {
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+    }
+
+    h1 {
+        color: #fff;
+        text-align: center;
+    }
+
+    #return-home {
+        color: #fff;
+        margin-top: 60px;
+        border-radius: 10px;
+        font-size: 18px;
+        width: fit-content;
+        border: 1px solid white;
+        cursor: pointer;
+        padding: 5px 20px;
+        transition: 0.2s;
+    }
+
+    #return-home:hover {
+        color: #666c7d;
+        transition: 0.2s;
+    }
+</style>
+
+<body>
+    <div class="container">
+        <h1>Unfortunately,<br>This page is on a bathroom break.</h1>
+        <img class="toilet-icon" src="/style/icons/toilet.svg" alt="toilet">
+        <div id="return-home">Return Home</div>
+    </div>
+</body>
+
+</html>
+
+<script>
+    $('#return-home').on('click', e => {
+        window.location = '/'
+    })
+</script>
