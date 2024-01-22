@@ -2,7 +2,28 @@ const map = document.getElementById('map');
 const mapContent = document.getElementById('map-content');
 const testBuilding = document.getElementById('test-building');
 
-let currentTransform = { x: 0, y: 0, scale: 1 };
+const zeroPos = {
+    franklin: { x: -89, y: 187, scale: 0.5 }
+}
+const labels = [
+    {
+        map: 'franklin',
+        name: 'franklin',
+        position: { x: -20, y: 0, scale: 1 }
+    },
+    {
+        map: 'franklin',
+        name: 'atkinson',
+        position: { x: -610, y: 982, scale: 1.2 }
+    },
+    {
+        map: 'franklin',
+        name: 'gym',
+        position: { x: -287, y: 666, scale: 1.3 }
+    }
+]
+
+let currentTransform = zeroPos.franklin;
 
 const navZoomScale = 0.2;
 const navZoomMin = 0.3;
@@ -125,7 +146,7 @@ function clamp(num, min, max) {
 
 
 $('#nav-home').on('click', e => {
-    currentTransform = { x: 0, y: 0, scale: 1 };
+    currentTransform = zeroPos.franklin;
     updateTransform();
 })
 
@@ -137,4 +158,11 @@ $('#nav-plus').on('click', e => {
 $('#nav-minus').on('click', e => {
     currentTransform.scale = Math.max(navZoomMin, Math.min(navZoomMax, currentTransform.scale - navZoomScale));
     updateTransform();
+})
+
+labels.forEach((label) => {
+    $(`#${label.map}-${label.name}-label`).on('click', e => {
+        currentTransform = label.position;
+        updateTransform();
+    })
 })

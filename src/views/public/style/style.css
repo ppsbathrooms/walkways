@@ -260,3 +260,29 @@ body {
   background: rgba(0, 0, 0, 0.5);
   display: none;
 }
+
+.text-box {
+  all: unset;
+  padding: 10px;
+  height: 10px;
+  border-radius: 10px;
+  background: var(--bgText);
+}
+
+.ml-10 {
+  margin-left: 10px;
+}
+
+.above-map {
+  z-index: 2;
+}
+
+.map-element {
+  position: absolute;
+  text-align: center;
+}
+
+.map-label {
+  cursor: pointer;
+  font-size: 50px;
+}

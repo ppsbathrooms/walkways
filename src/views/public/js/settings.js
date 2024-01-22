@@ -3,7 +3,11 @@ var options = [
         name: 'Settings',
         content: `
         <h1>Settings</h1>
-        <p>Prefered Name: ${user ? user.given_name: ''}</p>
+        <div class="fv">
+            <p>Preffered Name: </p>
+            <input class="text-box ml-10" type="text" value="${user ? user.given_name : ''}" maxlength="20" ></input>
+        </div>
+
         <p>Email: ${user ? user.email : ''}</p>
         `
     },
