@@ -87,3 +87,67 @@
     color: var(--bgTextHover);
     transition: 0.1s;
 }
+
+.schedule-holder {
+    display: flex;
+    width: fit-content;
+}
+
+.schedule-holder div {
+    width: fit-content;
+    display: flex;
+    flex-direction: column;
+}
+
+.schedule-column input {
+    width: 75px;
+}
+
+.schedule-column div {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    margin-right: 20px;
+    margin-bottom: 5px;
+}
+
+.schedule-column p  {
+    margin-right: 10px;
+}
+
+.br-prefs div {
+    display: flex;
+}
+
+.br-prefs p {
+    margin: 5px;
+    margin-left: 10px;
+}
+
+.school-select {
+    border-radius: 10px;
+    border: 1px solid white;
+    padding: 3px;
+    width: fit-content;
+    height: fit-content;
+    display: flex;
+    align-content: center;
+    justify-content: center;
+}
+
+.school-select select {
+    color: #fff;
+    margin: 0;
+    margin-right: 5px;
+    padding: 3px 5px;
+    border-radius: 5px;
+    background: none;
+    border: none;
+    font-family: monospace;
+    outline: none;
+}
+
+.school-select option {
+    color: #000;
+}

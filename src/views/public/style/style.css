@@ -267,7 +267,8 @@ body {
   padding: 10px;
   height: 10px;
   border-radius: 10px;
-  background: var(--bgText);
+  /* background: var(--bgText); */
+  border: 1px solid white;
 }
 
 .ml-10 {

@@ -1,5 +1,73 @@
 var options = [
     {
+        name: 'Preferences',
+        content: `
+        <h1>Preferences</h1>
+        <h2>school</h2>
+        <div class="school-select">
+            <select>
+                <option>cleveland</option>
+                <option>franklin</option>
+            </select>
+        </div><br>
+        <h2>schedule</h2>
+        <div class="schedule-holder">
+            <div class="schedule-column">
+                <div>
+                    <p>1</p>
+                    <input class="text-box" type="text" value="">                
+                </div>
+                <div>
+                    <p>2</p>
+                    <input class="text-box" type="text" value="">                
+                </div>
+                <div>
+                    <p>3</p>
+                    <input class="text-box" type="text" value="">                
+                </div>
+                <div>
+                    <p>4</p>
+                    <input class="text-box" type="text" value="">                
+                </div>
+            </div>
+            <div class="schedule-column">
+                <div>
+                    <p>5</p>
+                    <input class="text-box" type="text" value="">                
+                </div>
+                <div>
+                    <p>6</p>
+                    <input class="text-box" type="text" value="">                
+                </div>
+                <div>
+                    <p>7</p>
+                    <input class="text-box" type="text" value="">                
+                </div>
+                <div>
+                    <p>8</p>
+                    <input class="text-box" type="text" value="">                
+                </div>
+            </div>
+        </div>
+        <br>
+        <h2>bathroom preference</h2>
+        <div class="br-prefs">
+            <div>
+                <input class="check-box" type="checkbox">
+                <p>male</p>
+            </div>
+            <div>
+                <input class="check-box" type="checkbox">
+                <p>female</p>
+            </div>
+            <div>
+                <input class="check-box" type="checkbox" checked>
+                <p>all gender</p>
+            </div>
+        </div>
+        `
+    },
+    {
         name: 'Settings',
         content: `
         <h1>Settings</h1>
@@ -11,14 +79,6 @@ var options = [
         <p>Email: ${user ? user.email : ''}</p>
         `
     },
-    {
-        name: 'Preferences',
-        content: `
-        <h1>Preferences</h1>
-        <p>Imagine there are lots of user preferences here, you\'re welcome.</p>
-        <p>woohoo</p>
-        `
-    }
 ];
 
 let navbar;

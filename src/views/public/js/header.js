@@ -33,9 +33,10 @@ $(".logo").on("click", (e) => {
 const user = JSON.parse($('#data').html());
 
 if (user != null) {
-  $("#sign-in-button").hide();
+    $("#sign-in-button").hide();
+    const userImage = document.getElementById("user-photo")
+    userImage.src = user.picture;
     $("#user-info").html(`${user.displayName} - ${user.email}`);
-    $("#user-photo").attr("src", user.picture);
     $('#user-photo').fadeIn(100);
 } else {
   $("#sign-in-button").show();
