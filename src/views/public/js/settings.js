@@ -3,6 +3,13 @@ var options = [
         name: 'Preferences',
         content: `
         <h1>Preferences</h1>
+        <div class="fv">
+            <h2>theme</h2>
+            <label class="switch">
+                <input type="checkbox">
+                <span class="slider round"></span>
+            </label>
+        </div>
         <h2>school</h2>
         <div class="school-select">
             <select>
@@ -65,6 +72,7 @@ var options = [
                 <p>all gender</p>
             </div>
         </div>
+        <div style="height: 50px;"></div>
         `
     },
     {

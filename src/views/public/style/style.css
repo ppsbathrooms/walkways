@@ -65,41 +65,10 @@ body {
   align-items: center;
 }
 
-#map-holder {
-  width: 100%;
-}
-
-#map-content {
-  background-color: #181b1c;
-  width: 100vw;
-  height: 100vh;
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: -1; /* Ensure the div is behind other elements */
-}
-
-#map {
-  transition: 0.05s linear;
-  user-select: none;
-  cursor: grab;
-  width: 100%;
-  height: 100%;
-}
-
 .building {
   width: 100px;
   height: 100px;
   background: rgb(46, 46, 46);
-}
-
-#map img {
-  user-drag: none;
-  -webkit-user-drag: none;
-  user-select: none;
-  -moz-user-select: none;
-  -webkit-user-select: none;
-  -ms-user-select: none;
 }
 
 #test-building {
@@ -260,6 +229,7 @@ body {
   z-index: 2;
   background: rgba(0, 0, 0, 0.5);
   display: none;
+  backdrop-filter: blur(5px);
 }
 
 .text-box {
@@ -267,7 +237,6 @@ body {
   padding: 10px;
   height: 10px;
   border-radius: 10px;
-  /* background: var(--bgText); */
   border: 1px solid white;
 }
 
@@ -290,6 +259,7 @@ body {
 }
 
 #map-canvas {
+  cursor: auto;
   position: fixed;
   top: 0;
   bottom: 0;
@@ -297,4 +267,32 @@ body {
   left: 0;
 
   z-index: -1;
+}
+
+.debug-menu {
+  width: 350px;
+  height: 350px;
+  background: var(--background);
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  border-radius: 20px;
+  padding: 10px 30px;
+  display: none; 
+  /* idk i dont want to deal with this */
+}
+
+.debug-menu h1 {
+  text-align: center;
+}
+
+.debug-menu input {
+  margin-right: 5px;
+}
+
+.debug-menu p {
+  margin: 5px;
 }

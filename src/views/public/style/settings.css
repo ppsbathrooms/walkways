@@ -6,7 +6,8 @@
     border-radius: 20px;
     border: 1px solid white;
     display: none;
-    /* display: flex; */
+
+    box-shadow: 0 0 10px #141a21;
 
     left: 50%;
     top: 50%;
@@ -36,6 +37,7 @@
     left: 200px;
     padding: 20px;
     display: none;
+    overflow-y: scroll;
 }
 
 .settingsPanels {
@@ -73,7 +75,7 @@
 }
 
 #close-settings-button {
-    position: absolute;
+    position: fixed;
     padding: 0px 15px;
     cursor: pointer;
     border: 1px solid white;
@@ -150,4 +152,66 @@
 
 .school-select option {
     color: #000;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 30px;
+    height: 17px;
+    transform: scale(1.25);
+    margin-left: 15px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 1px solid white;
+    -webkit-transition: .2s;
+    transition: .2s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 13px;
+    width: 13px;
+    left: 1px;
+    top: 1px;
+    bottom: 2px;
+    background-color: white;
+    -webkit-transition: .2s;
+    transition: .2s;
+}
+
+input:checked+.slider {
+    background-color: #aaa;
+}
+
+input:focus+.slider {
+    box-shadow: 0 0 1px #aaa;
+}
+
+input:checked+.slider:before {
+    -webkit-transform: translateX(13px);
+    -ms-transform: translateX(13px);
+    transform: translateX(13px);
+}
+
+.slider.round {
+    border-radius: 17px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
 }
