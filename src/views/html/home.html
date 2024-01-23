@@ -30,31 +30,7 @@
     <div class="sidebar"></div>
     <div class="hide" id="data"><%- data %></div>
 
-    <div class="debug-menu">
-      <h1>debug</h1>
-
-      <h2>coords</h2>
-      <div class="fv">
-        <input id="ref-points-toggle" type="checkbox">
-        <p>show reference points</p>
-      </div>
-      <div class="fv">
-        <input type="checkbox">
-        <p>log mouse coordinates</p>
-      </div>
-      <div class="fv">
-        <input type="checkbox">
-        <p>log mouse longitude/latitude</p>
-      </div>
-      <div>
-        <p>reference point size</p>
-        <div class="fv">
-          <input type="range" min="0.5" max="15" value="2" step="0.1">
-          <p id="ref-point-size-display">2.0</p>
-        </div>
-      </div>
-      <p id="debug-user-coords">user coords: null</p>
-    </div>
+    <div class="debug-menu"></div>
 
     <canvas id="map-canvas"></canvas>
 

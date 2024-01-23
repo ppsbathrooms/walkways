@@ -19,8 +19,78 @@ $(document).ready(() => {
         mouseCoords: false,
         mouseLocation: false,
         drawRefPoints: false,
+        userCoords: false,
         refPointRadius: 2
     }
+
+    var updateUserCoords = false;
+
+    var locationUpdateInterval = setInterval(updateUserLocation, 10000);
+
+    function updateUserLocation() {
+        if(!updateUserCoords) {
+            return;
+        }
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+            var userLocation = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+            };
+            if(debug.userCoords) {
+                console.log('User location:', userLocation);                
+            }
+
+                userCoords = userLocation;
+                updateCoords(userLocation)
+                drawMap();
+            },
+            function(error) {
+            console.error('Error getting user location:', error.message);
+            }
+        );
+    }
+
+    if (navigator.permissions) {
+    navigator.permissions.query({ name: 'geolocation' })
+        .then(permissionStatus => {
+        if (permissionStatus.state === 'granted') {
+            // user has already given access to their location
+            navigator.geolocation.getCurrentPosition(
+            function(position) {
+                var userLocation = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+
+                // userLocation = {
+                //     lat: 45.502204, 
+                //     lng: -122.606125
+                // } // coords to test with, ignore dis
+                updateUserCoords = true;
+                userCoords = userLocation;
+                drawMap();
+            },
+            function(error) {
+                console.error('Error getting user location:', error.message);
+            }
+            );
+        } else if (permissionStatus.state === 'prompt') {
+            // console.log('location permission prompt not answered yet');
+        } else {
+            // location permission denied
+            // console.log('location permission denied');
+        }
+        })
+        .catch(error => {
+        console.error('Error checking location permission:', error.message);
+        });
+    } else {
+    // geolocation permissions API is not supported by the browser
+    console.error('Geolocation is not supported by this browser.');
+    }
+
+
 
     const referencePoints = {
         franklin : [
@@ -77,7 +147,18 @@ $(document).ready(() => {
 
             canvasCoords = convertCoordinatesToCanvas(userCoords.lat, userCoords.lng, transformParams)
             // canvasCoords = convertCoordinatesToCanvas(45.50333356541381, -122.60484722199548, transformParams)
-            ctx.fillStyle = 'blue'; 
+
+            ctx.fillStyle = 'rgba(66, 133, 250, 0.2)'; 
+            ctx.beginPath();
+            ctx.arc(canvasCoords.canvasX, canvasCoords.canvasY, 15, 0, 2 * Math.PI);
+            ctx.fill();
+
+            ctx.fillStyle = 'white'; 
+            ctx.beginPath();
+            ctx.arc(canvasCoords.canvasX, canvasCoords.canvasY, 7, 0, 2 * Math.PI);
+            ctx.fill();
+
+            ctx.fillStyle = '#4285FA'; 
             ctx.beginPath();
             ctx.arc(canvasCoords.canvasX, canvasCoords.canvasY, 5, 0, 2 * Math.PI);
             ctx.fill();
@@ -244,7 +325,7 @@ $(document).ready(() => {
         });
 
         $('#nav-plus').on('click', e => {
-            const scaleFactor = 1.1;
+            const scaleFactor = 1.25;
             const cursor = { x: canvas.width / 2, y: canvas.height / 2 };
             const newScale = Math.max(navZoomMin, Math.min(navZoomMax, scale * scaleFactor));
 
@@ -256,7 +337,7 @@ $(document).ready(() => {
         });
 
         $('#nav-minus').on('click', e => {
-            const scaleFactor = 0.9;
+            const scaleFactor = 0.75;
             const cursor = { x: canvas.width / 2, y: canvas.height / 2 };
             const newScale = Math.max(navZoomMin, Math.min(navZoomMax, scale * scaleFactor));
 
@@ -271,11 +352,19 @@ $(document).ready(() => {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (geolocationPosition) => {
-                        userCoords = {
+                        userLocation = {
                             lat: geolocationPosition.coords.latitude,
                             lng: geolocationPosition.coords.longitude,
                         };
-                        $('#debug-user-coords').html(`${userCoords.lat}, ${userCoords.lng}`)
+
+                        // userLocation = {
+                        //     lat: 45.502204, 
+                        //     lng: -122.606125
+                        // } // testing coords, ignore dis
+
+                        userCoords = userLocation
+                        updateCoords(userLocation)
+                        updateUserCoords = true;
                         drawMap();
                     },
                     (error) => {
@@ -301,6 +390,9 @@ $(document).ready(() => {
             case 4:
                 debug.mouseLocation = $(this).prop('checked');
                 break;
+            case 5:
+                debug.userCoords = $(this).prop('checked');
+                break;
         }
     });
 
@@ -318,7 +410,43 @@ $(document).ready(() => {
 
 $(document).keydown(function(e) {
     if (e.key === '`' || e.key === '`') {
-        $('.debug-menu').fadeToggle(200);
-        $('#content-fade')    
+        $('.debug-menu').fadeToggle(100);
+        // $('#content-fade').fadeToggle(100);
     }
 });
+
+
+var debugShit = `
+      <h1>debug</h1>
+
+      <h2>coords</h2>
+      <div class="fv">
+        <input id="ref-points-toggle" type="checkbox">
+        <p>show reference points</p>
+      </div>
+      <div class="fv">
+        <input type="checkbox">
+        <p>log mouse coordinates</p>
+      </div>
+      <div class="fv">
+        <input type="checkbox">
+        <p>log mouse longitude/latitude</p>
+      </div>
+      <div class="fv">
+        <input type="checkbox">
+        <p>log user coords/latitude</p>
+      </div>
+      <div>
+        <p>reference point size</p>
+        <div class="fv">
+          <input type="range" min="0.5" max="15" value="2" step="0.1">
+          <p id="ref-point-size-display">2.0</p>
+        </div>
+      </div>
+      <p id="debug-user-coords">user coords: null</p>`
+
+$('.debug-menu').html(debugShit)
+
+function updateCoords(coords) {
+    $('#debug-user-coords').html(`${coords.lat}, ${coords.lng}`)
+}
