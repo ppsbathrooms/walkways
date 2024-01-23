@@ -72,6 +72,17 @@ $(document).ready(() => {
             drawReferencePoints();
         }
 
+        if(userCoords) {
+            const transformParams = calculateTransformParameters(referencePoints.franklin);
+
+            canvasCoords = convertCoordinatesToCanvas(userCoords.lat, userCoords.lng, transformParams)
+            // canvasCoords = convertCoordinatesToCanvas(45.50333356541381, -122.60484722199548, transformParams)
+            ctx.fillStyle = 'blue'; 
+            ctx.beginPath();
+            ctx.arc(canvasCoords.canvasX, canvasCoords.canvasY, 5, 0, 2 * Math.PI);
+            ctx.fill();
+        }
+
         ctx.setTransform(1, 0, 0, 1, 0, 0); // reset transform to stop weird edge trails
         redrawScheduled = false;
     }
@@ -126,6 +137,14 @@ $(document).ready(() => {
         const lat = (mouseY - translation.y) / yScaleFactor;
         return { lat, lng };
     }
+
+    function convertCoordinatesToCanvas(lat, lng, transformParams) {
+        const { xScaleFactor, yScaleFactor, translation } = transformParams;
+        const canvasX = (lng * xScaleFactor) + translation.x;
+        const canvasY = (lat * yScaleFactor) + translation.y;
+        return { canvasX, canvasY };
+    }
+
 
     img.onload = () => {
         updateCanvasSize(); // set initial canvas size
@@ -190,11 +209,11 @@ $(document).ready(() => {
         function zoom(e) {
             const scaleFactor = e.deltaY > 0 ? 0.9 : 1.1;
             // calc new scale
-            const newScale = Math.max(navZoomMin, Math.min(navZoomMax, scale * scaleFactor));
-            // const newScale = scale * scaleFactor
-            if (newScale === navZoomMin || newScale === navZoomMax) {
-                return; // do nothing at scale limits
-            }
+            // const newScale = Math.max(navZoomMin, Math.min(navZoomMax, scale * scaleFactor));
+            const newScale = scale * scaleFactor
+            // if (newScale === navZoomMin || newScale === navZoomMax) {
+                // return; // do nothing at scale limits
+            // }
 
             const cursor = getCursorPosition(e);
             // calc the adjustment to keep the cursor fixed
@@ -256,8 +275,7 @@ $(document).ready(() => {
                             lat: geolocationPosition.coords.latitude,
                             lng: geolocationPosition.coords.longitude,
                         };
-                        alert(`You are at ${userCoords.lat}, ${userCoords.lng}`);
-                        // update the map with the user's location
+                        $('#debug-user-coords').html(`${userCoords.lat}, ${userCoords.lng}`)
                         drawMap();
                     },
                     (error) => {
