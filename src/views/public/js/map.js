@@ -23,6 +23,24 @@ $(document).ready(() => {
         refPointRadius: 2
     }
 
+    const referencePoints = {
+        franklin : [
+            { x: 1646.21, y: 1230.18, lat: 45.502753693086014, lng: -122.60773267642072 },
+            { x: 1709.40, y: 1607.79, lat: 45.501580327311395, lng: -122.60747230138658  },
+            { x: 1711.15, y: 1230.39, lat: 45.50275598013354, lng: -122.60744278116181 },
+            { x: 683.39, y: 327.56, lat: 45.50565802270125, lng: -122.61210386372252 },
+            { x: 3200.98, y: 2483.79, lat: 45.49878086221833, lng: -122.60075043228514 },
+            { x: 2066.50, y: 793.75, lat: 45.50416316877892, lng: -122.60585572095987 },
+            { x: 2563.13, y: 489.38, lat: 45.50510957953357, lng: -122.60360829125972 },
+            { x: 701.04, y: 1758.26, lat: 45.501085257407006, lng: -122.61204860136078 },
+            { x: 1700.19, y: 766.95, lat: 45.504230361926844, lng: -122.60753101363174},
+            { x: 1977.18, y: 793.47, lat: 45.50412907956996, lng: -122.60626596589613},
+            { x: 2936.03, y: 1050.57, lat: 45.503338740168346, lng: -122.60191204876772},
+            { x: 1932.64, y: 1390.31, lat: 45.50223980847806, lng: -122.60643339865355},
+        ] 
+    }
+
+
     var updateUserCoords = false;
 
     var locationUpdateInterval = setInterval(updateUserLocation, 10000);
@@ -90,25 +108,6 @@ $(document).ready(() => {
     console.error('Geolocation is not supported by this browser.');
     }
 
-
-
-    const referencePoints = {
-        franklin : [
-            { x: 1646, y: 1230, lat: 45.502753693086014, lng: -122.60773267642072 },
-            { x: 1709.5, y: 1608, lat: 45.501580327311395, lng: -122.60747230138658  },
-            { x: 1710, y: 1230, lat: 45.50275598013354, lng: -122.60744278116181 },
-            { x: 685, y: 327, lat: 45.50565802270125, lng: -122.61210386372252 },
-            { x: 3201, y: 2483, lat: 45.49878086221833, lng: -122.60075043228514 },
-            { x: 2066, y: 793, lat: 45.50416316877892, lng: -122.60585572095987 },
-            { x: 2563, y: 489, lat: 45.50510957953357, lng: -122.60360829125972 },
-            { x: 701, y: 1758, lat: 45.501085257407006, lng: -122.61204860136078 },
-            { x: 1700.32, y: 767.15, lat: 45.504230361926844, lng: -122.60753101363174},
-            { x: 1977.24, y: 793.84, lat: 45.50412907956996, lng: -122.60626596589613},
-            { x: 2937.03, y: 1051.21, lat: 45.503338740168346, lng: -122.60191204876772},
-        ]
-    }
-
-
     // update canvas size to window size
     function updateCanvasSize() {
         canvas.width = window.innerWidth;
@@ -146,21 +145,25 @@ $(document).ready(() => {
             const transformParams = calculateTransformParameters(referencePoints.franklin);
 
             canvasCoords = convertCoordinatesToCanvas(userCoords.lat, userCoords.lng, transformParams)
-            // canvasCoords = convertCoordinatesToCanvas(45.50333356541381, -122.60484722199548, transformParams)
+        
+            const outerDotSize = 15 / scale;
 
             ctx.fillStyle = 'rgba(66, 133, 250, 0.2)'; 
             ctx.beginPath();
-            ctx.arc(canvasCoords.canvasX, canvasCoords.canvasY, 15, 0, 2 * Math.PI);
+            ctx.arc(canvasCoords.canvasX, canvasCoords.canvasY, outerDotSize, 0, 2 * Math.PI);
             ctx.fill();
 
+            const borderDotSize = 7 / scale;
             ctx.fillStyle = 'white'; 
             ctx.beginPath();
-            ctx.arc(canvasCoords.canvasX, canvasCoords.canvasY, 7, 0, 2 * Math.PI);
+            ctx.arc(canvasCoords.canvasX, canvasCoords.canvasY, borderDotSize, 0, 2 * Math.PI);
             ctx.fill();
+
+            const dotSize = 5 / scale;
 
             ctx.fillStyle = '#4285FA'; 
             ctx.beginPath();
-            ctx.arc(canvasCoords.canvasX, canvasCoords.canvasY, 5, 0, 2 * Math.PI);
+            ctx.arc(canvasCoords.canvasX, canvasCoords.canvasY, dotSize, 0, 2 * Math.PI);
             ctx.fill();
         }
 
@@ -173,7 +176,7 @@ $(document).ready(() => {
         for (const referencePoint of referencePoints.franklin) {
             ctx.fillStyle = 'red'; 
             ctx.beginPath();
-            ctx.arc(referencePoint.x, referencePoint.y, debug.refPointRadius, 0, 2 * Math.PI);
+            ctx.arc(referencePoint.x, referencePoint.y, debug.refPointRadius / scale, 0, 2 * Math.PI);
             ctx.fill();
         }
     }
