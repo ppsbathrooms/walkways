@@ -96,7 +96,6 @@ $(document).ready(() => {
         } else if (permissionStatus.state === 'prompt') {
             // console.log('location permission prompt not answered yet');
         } else {
-            // location permission denied
             // console.log('location permission denied');
         }
         })
@@ -147,7 +146,6 @@ $(document).ready(() => {
             canvasCoords = convertCoordinatesToCanvas(userCoords.lat, userCoords.lng, transformParams)
         
             const outerDotSize = 15 / scale;
-
             ctx.fillStyle = 'rgba(66, 133, 250, 0.2)'; 
             ctx.beginPath();
             ctx.arc(canvasCoords.canvasX, canvasCoords.canvasY, outerDotSize, 0, 2 * Math.PI);
@@ -161,7 +159,7 @@ $(document).ready(() => {
 
             const dotSize = 5 / scale;
 
-            ctx.fillStyle = '#4285FA'; 
+            ctx.fillStyle = 'rgba(66, 133, 250, 1)'; 
             ctx.beginPath();
             ctx.arc(canvasCoords.canvasX, canvasCoords.canvasY, dotSize, 0, 2 * Math.PI);
             ctx.fill();
@@ -364,16 +362,21 @@ $(document).ready(() => {
                         //     lat: 45.502204, 
                         //     lng: -122.606125
                         // } // testing coords, ignore dis
-
-                        userCoords = userLocation
-                        updateCoords(userLocation)
                         updateUserCoords = true;
+                        userCoords = userLocation;
+                        updateCoords(userLocation);
                         drawMap();
                     },
                     (error) => {
-                        console.error(`Geolocation error: ${error.message}`);
+                        if (error.code === error.PERMISSION_DENIED) {
+                            pageError('You have disabled location services. Please enable them to use this feature.');
+                        } else {
+                            console.log(`Geolocation error: ${error.message}`);
+                        }
                     }
                 );
+            } else {
+                pageError('Geolocation is not supported by your browser.');
             }
         });
 
@@ -418,6 +421,9 @@ $(document).keydown(function(e) {
     }
 });
 
+function updateCoords(coords) {
+    $('#debug-user-coords').html(`${coords.lat}, ${coords.lng}`)
+}
 
 var debugShit = `
       <h1>debug</h1>
@@ -449,7 +455,3 @@ var debugShit = `
       <p id="debug-user-coords">user coords: null</p>`
 
 $('.debug-menu').html(debugShit)
-
-function updateCoords(coords) {
-    $('#debug-user-coords').html(`${coords.lat}, ${coords.lng}`)
-}
