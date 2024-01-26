@@ -120,7 +120,8 @@ $('.navbar-option').on('click', function() {
     $(`#account-${selectedOption}`).addClass('activeSetting');
 });
 
-$('#close-settings-button').on('click', e => {
+$(document).on('click', '#close-settings-button', e => { 
+    // save settings and shi
     hideSettings();
 })
 

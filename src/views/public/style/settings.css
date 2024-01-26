@@ -82,12 +82,13 @@
     border-radius: 10px;
     right: 20px;
     bottom: 20px;
-    transition: 0.1s;
+    transition: 0.2s;
 }
 
 #close-settings-button:hover {
-    color: var(--bgTextHover);
-    transition: 0.1s;
+    /* filter: brightness(70%); */
+    border: 1px solid #0f9d58;
+    transition: 0.2s;
 }
 
 .schedule-holder {
