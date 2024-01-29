@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls'
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 const renderer = new THREE.WebGLRenderer();
 
@@ -7,7 +8,22 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 
 document.body.appendChild(renderer.domElement);
 
+const loader = new GLTFLoader();
+
+loader.load( '/src/assets/franklinModel.glb', function ( franklin ) {
+
+	scene.add( franklin.scene );
+
+}, undefined, function ( error ) {
+
+	console.error( error );
+
+} );
+
+window.addEventListener('resize', onWindowResize);
+
 const scene = new THREE.Scene();
+scene.background = new THREE.Color('#121211');
 
 const camera = new THREE.PerspectiveCamera(
     75,
@@ -21,19 +37,38 @@ const orbit = new OrbitControls(camera, renderer.domElement);
 camera.position.set(1, 3, 10);
 orbit.update();
 
+// lights
+const light = new THREE.PointLight('#ffffff', 100, 100);
+light.position.set(0,10,0);
+scene.add(light);
+
+const ambient = new THREE.AmbientLight( 0x404040 ); // soft white light
+scene.add( ambient );
+
 const axesHelper = new THREE.AxesHelper(5);
-scene.add(axesHelper);
-
-const boxGeometry = new THREE.BoxGeometry();
-const boxMaterial = new THREE.MeshBasicMaterial({color: 0x00ff00})
-const box = new THREE.Mesh(boxGeometry, boxMaterial);
-scene.add(box);
-
+// scene.add(axesHelper);
 
 function animate() {
-    box.rotation.x += 0.01;
-    box.rotation.y += 0.01;
+    requestAnimationFrame(animate);
+
     renderer.render(scene, camera);
 }
 
 renderer.setAnimationLoop(animate)
+
+
+function onWindowResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+orbit.addEventListener('start', function () {
+  orbit.domElement.style.cursor = 'move';
+});
+
+orbit.addEventListener('end', function () {
+  orbit.domElement.style.cursor = 'auto';
+});
+
+orbit.domElement.style.cursor = 'auto';
