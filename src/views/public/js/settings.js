@@ -80,7 +80,7 @@ var options = [
         content: `
         <h1>Settings</h1>
         <div class="fv">
-            <p>Preffered Name: </p>
+            <p>Preferred Name: </p>
             <input class="text-box ml-10" type="text" value="${user ? user.given_name : ''}" maxlength="20" ></input>
         </div>
 
