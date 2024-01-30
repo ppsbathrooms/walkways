@@ -1,4 +1,25 @@
 body {
-    background: #121211;
+    overflow-x: none;
+    color: #fff;
+    background-color: #121211;
+}
+
+canvas {
     margin: 0;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    top: 0;
+    right: 0;
+    z-index: -1;
+}
+
+.fv {
+    display: flex;
+    align-items: center;
+}
+
+.fh {
+    display: flex;
+    justify-content: center;
 }

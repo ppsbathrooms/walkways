@@ -53,8 +53,9 @@ function animate() {
 
     renderer.render(scene, camera);
 }
-
-renderer.setAnimationLoop(animate)
+orbit.addEventListener( 'change', animate );
+animate();
+// renderer.setAnimationLoop(animate)
 
 
 function onWindowResize() {

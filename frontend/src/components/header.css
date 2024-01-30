@@ -1,0 +1,53 @@
+.navbar {
+    pointer-events: none;
+    justify-content: space-between;
+    height: 75px;
+    position: absolute;
+    right: 0;
+    left: 0;
+    top: 0;
+}
+
+.signIn {
+    pointer-events: all;
+    cursor: pointer;
+    width: 100px;
+    height: 40px;
+    border-radius: 10px;
+    margin-right: 20px;
+    border: 1px solid white;
+    transition: 0.1s;
+}
+
+.signIn:hover {
+    color: var(--bgTextHover);
+    transition: 0.1s;
+}
+
+.logo {
+    margin-left: 20px;
+}
+
+.logo h1 {
+    pointer-events: all;
+    cursor: pointer;
+}
+
+#user-dropdown {
+    pointer-events: all;
+    position: fixed;
+    right: 20px;
+    border-radius: 10px;
+    top: 60px;
+    width: fit-content;
+    margin-left: 20px;
+    height: fit-content;
+    background: var(--background);
+    padding: 5px;
+    display: none;
+}
+
+#user-dropdown p {
+    margin: 10px 20px;
+    cursor: pointer;
+}
