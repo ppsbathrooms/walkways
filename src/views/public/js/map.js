@@ -14,6 +14,8 @@ $(document).ready(() => {
 
     let userCoords =  null;
 
+    let grabbinMap = false;
+
     const navZoomMin = 0.3;
     const navZoomMax = 2.0;
 
@@ -397,6 +399,7 @@ $(document).ready(() => {
         }
 
         function handleMouseMove(e) {
+            let somethingHovered = false
             labels.forEach(({ id, x, y, text }) => {
                 const rect = canvas.getBoundingClientRect();
                 const mouseX = (e.clientX - rect.left - translation.x) / scale;
@@ -408,9 +411,19 @@ $(document).ready(() => {
                 const centeredX = x - textWidth / 2;
 
                 if (mouseX > centeredX && mouseX < centeredX + textWidth && mouseY > y - textHeight && mouseY < y) {
-                    console.log(`over ${id}`)
+                    if(!somethingHovered) {
+                        somethingHovered = true;
+                    }
                 }
             });
+            if(somethingHovered) {
+                $('#map-canvas').css('cursor', 'pointer');
+            }
+            else {
+                if(!grabbinMap) {
+                    $('#map-canvas').css('cursor', 'auto');
+                }
+            }
 
             // debug shit
             const rect = canvas.getBoundingClientRect();
@@ -435,6 +448,7 @@ $(document).ready(() => {
 
 
         function startDrag(e) {
+            grabbinMap = true;
             $('#map-canvas').css('cursor', 'grabbing')
             isDragging = true;
             startCoords = { x: e.clientX, y: e.clientY };
@@ -452,6 +466,7 @@ $(document).ready(() => {
         }
 
         function endDrag() {
+            grabbinMap = false;
             $('#map-canvas').css('cursor', 'auto')
             isDragging = false;
         }
