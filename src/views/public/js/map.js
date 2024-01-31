@@ -144,7 +144,12 @@ $(document).ready(() => {
     }
 
     // update canvas size to window size
-    function updateCanvasSize() {
+    function updateCanvasSize(duration) {
+
+        if(!duration) {
+            duration = false;
+        }
+
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
         let home = {x: 0, y: 0};
@@ -156,21 +161,56 @@ $(document).ready(() => {
             }
         }
         // recalc translation to keep map centered
-        gotToPosition(home.x, home.y)
+        // dis buggy
+        goToPosition(home.x, home.y, scale, duration)
         scheduleRedraw();
     }
 
-    function gotToPosition(x, y, newScale) {
+    function goToPosition(x, y, newScale, duration) {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
-        if(newScale) {
+
+        if (duration) {
+            // animated zoom with easing
+            const initialScale = scale;
+            const initialTranslationX = translation.x;
+            const initialTranslationY = translation.y;
+            const targetTranslationX = (canvas.width / 2) - ((newScale * img.width) / 2) - x;
+            const targetTranslationY = (canvas.height / 2) - ((newScale * img.height) / 2) - y;
+            let startTime;
+
+            function easeOut(t) {
+                return 1 - Math.pow(1 - t, 3); // cubic ease-out
+            }
+
+            function animateZoom(timestamp) {
+                if (!startTime) startTime = timestamp;
+
+                const elapsed = timestamp - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const easedProgress = easeOut(progress);
+
+                scale = initialScale + (newScale - initialScale) * easedProgress;
+                translation.x = initialTranslationX + (targetTranslationX - initialTranslationX) * easedProgress;
+                translation.y = initialTranslationY + (targetTranslationY - initialTranslationY) * easedProgress;
+
+                scheduleRedraw();
+
+                // continue animation if not finished
+                if (progress < 1) {
+                    requestAnimationFrame(animateZoom);
+                }
+            }
+
+            requestAnimationFrame(animateZoom);
+        } else {
             scale = newScale;
+            translation = {
+                x: (canvas.width / 2) - ((scale * img.width) / 2) - x,
+                y: (canvas.height / 2) - ((scale * img.height) / 2) - y
+            };
+            scheduleRedraw();
         }
-        translation = {
-            x: (canvas.width / 2) - ((scale * img.width) / 2) - x,
-            y: (canvas.height / 2) - ((scale * img.height) / 2) - y
-        };
-        scheduleRedraw();
     }
 
     // schedule redraw for smoother rendering
@@ -181,7 +221,9 @@ $(document).ready(() => {
         }
     }
 
-    window.addEventListener('resize', updateCanvasSize);
+    window.addEventListener('resize', e => {
+        updateCanvasSize(false)
+    });
 
     // draw map on the canvas
     function drawMap() {
@@ -311,19 +353,12 @@ $(document).ready(() => {
 
 
     img.onload = () => {
-        switch (currentSchool) {
-            case 'franklin': {
-                scale = homePositions.franklin.scale
-                break;
-            }
-        }
-
+        scale = homePositions.franklin.scale
         updateCanvasSize(); // set initial canvas size
-
         let isDragging = false;
         let startCoords = { x: 0, y: 0 };
 
-        // panning and zoomin
+        // pannin and zoomin
         canvas.addEventListener('mousemove', drag);
         document.addEventListener('mouseup', endDrag);
         canvas.addEventListener('wheel', zoom);
@@ -346,33 +381,49 @@ $(document).ready(() => {
                 if (mouseX > centeredX && mouseX < centeredX + textWidth && mouseY > y - textHeight && mouseY < y) {
                     labelName = id.replace(/^label-/, '');
                     labelData = getLabelData(labelName)
-                    gotToPosition(labelData.x, labelData.y, labelData.scale)
+                    goToPosition(labelData.x, labelData.y, labelData.scale, 400)
                 }
             });
+        
         });
 
-    function getLabelData(schoolName) {
-        if (labelPositions.franklin.hasOwnProperty(schoolName)) {
-            var labelPosition = labelPositions.franklin[schoolName];
-            return labelPosition;
-        } else {
-            return null;
+        function getLabelData(schoolName) {
+            if (labelPositions.franklin.hasOwnProperty(schoolName)) {
+                var labelPosition = labelPositions.franklin[schoolName];
+                return labelPosition;
+            } else {
+                return null;
+            }
         }
-    }
 
-        function handleMouseMove(event) {
+        function handleMouseMove(e) {
+            labels.forEach(({ id, x, y, text }) => {
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = (e.clientX - rect.left - translation.x) / scale;
+                const mouseY = (e.clientY - rect.top - translation.y) / scale;
+
+                const textWidth = ctx.measureText(text).width * 1.75;
+                const textHeight = getTextHeight(ctx.font);
+
+                const centeredX = x - textWidth / 2;
+
+                if (mouseX > centeredX && mouseX < centeredX + textWidth && mouseY > y - textHeight && mouseY < y) {
+                    console.log(`over ${id}`)
+                }
+            });
+
             // debug shit
             const rect = canvas.getBoundingClientRect();
             if (debug.mouseCoords) {
-                const mouseX = (event.clientX - rect.left - translation.x) / scale;
-                const mouseY = (event.clientY - rect.top - translation.y) / scale;
+                const mouseX = (e.clientX - rect.left - translation.x) / scale;
+                const mouseY = (e.clientY - rect.top - translation.y) / scale;
 
                 console.log(`${mouseX.toFixed(2)}, ${mouseY.toFixed(2)}`);
             }
 
             if(debug.mouseLocation) {
-                const mouseX = (event.clientX - rect.left) / scale - translation.x / scale;
-                const mouseY = (event.clientY - rect.top) / scale - translation.y / scale;
+                const mouseX = (e.clientX - rect.left) / scale - translation.x / scale;
+                const mouseY = (e.clientY - rect.top) / scale - translation.y / scale;
 
                 const transformParams = calculateTransformParameters(referencePoints.franklin);
                 const { lat, lng } = convertCanvasToCoordinates(mouseX, mouseY, transformParams);
@@ -437,13 +488,8 @@ $(document).ready(() => {
         }
 
         $('#nav-home').on('click', e => {
-            switch (currentSchool) {
-                case 'franklin': {
-                    scale = homePositions.franklin.scale
-                    break;
-                }
-            }
-            updateCanvasSize();
+            scale = homePositions.franklin.scale
+            updateCanvasSize(400);
             scheduleRedraw();
         });
 
