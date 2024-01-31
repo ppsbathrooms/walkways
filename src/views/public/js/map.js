@@ -33,6 +33,26 @@ $(document).ready(() => {
         }
     }
 
+    const labelPositions = {
+        franklin: {
+            franklin: {
+                x: -75, 
+                y: 150,
+                scale: 1.5
+            },
+            gym: {
+                x: 500,
+                y: -1400,
+                scale: 3 
+            },
+            track: {
+                x: -100, 
+                y: -700,
+                scale: 2    
+            }
+        }
+    }
+
     const labels = [
         { id: "label-franklin", text: "Franklin", x: 1837, y: 1446, size: 50 },
         { id: "label-track", text: "Track", x: 1830, y: 948, size: 30 },
@@ -136,9 +156,19 @@ $(document).ready(() => {
             }
         }
         // recalc translation to keep map centered
+        gotToPosition(home.x, home.y)
+        scheduleRedraw();
+    }
+
+    function gotToPosition(x, y, newScale) {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        if(newScale) {
+            scale = newScale;
+        }
         translation = {
-            x: (canvas.width / 2) - ((scale * img.width) / 2) - home.x,
-            y: (canvas.height / 2) - ((scale * img.height) / 2) - home.y
+            x: (canvas.width / 2) - ((scale * img.width) / 2) - x,
+            y: (canvas.height / 2) - ((scale * img.height) / 2) - y
         };
         scheduleRedraw();
     }
@@ -314,10 +344,21 @@ $(document).ready(() => {
                 const centeredX = x - textWidth / 2;
 
                 if (mouseX > centeredX && mouseX < centeredX + textWidth && mouseY > y - textHeight && mouseY < y) {
-                    console.log(`clicked ${id}`)
+                    labelName = id.replace(/^label-/, '');
+                    labelData = getLabelData(labelName)
+                    gotToPosition(labelData.x, labelData.y, labelData.scale)
                 }
             });
         });
+
+    function getLabelData(schoolName) {
+        if (labelPositions.franklin.hasOwnProperty(schoolName)) {
+            var labelPosition = labelPositions.franklin[schoolName];
+            return labelPosition;
+        } else {
+            return null;
+        }
+    }
 
         function handleMouseMove(event) {
             // debug shit

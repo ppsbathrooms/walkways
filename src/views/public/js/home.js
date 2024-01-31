@@ -21,3 +21,13 @@ function pageError(errorText) {
     errorElement.remove();
   }, 4300);
 }
+
+document.addEventListener(
+  'wheel',
+  function touchHandler(e) {
+    if (e.ctrlKey) {
+      e.preventDefault();
+    }
+  },
+  { passive: false }
+);
