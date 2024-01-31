@@ -6,6 +6,8 @@ $(document).ready(() => {
     const img = new Image();
     img.src = svgFile;
 
+    currentSchool = 'franklin'
+
     let scale = 1;
     let redrawScheduled = false;
     let translation = { x: 0, y: 0 };
@@ -22,10 +24,19 @@ $(document).ready(() => {
         userCoords: false,
         refPointRadius: 2
     }
+    
+    const homePositions = {
+        franklin: {
+            x: -75, 
+            y: -120,
+            scale: 0.75
+        }
+    }
 
     const labels = [
         { id: "label-franklin", text: "Franklin", x: 1837, y: 1446, size: 50 },
-        { id: "label-track", text: "Track", x: 1827, y: 948, size: 30 },
+        { id: "label-track", text: "Track", x: 1830, y: 948, size: 30 },
+        { id: "label-gym", text: "Gym", x: 2023, y: 895, size: 30 },
     ];
 
     const referencePoints = {
@@ -116,11 +127,18 @@ $(document).ready(() => {
     function updateCanvasSize() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
-
+        let home = {x: 0, y: 0};
+        switch (currentSchool) {
+            case 'franklin': {
+                home.x = homePositions.franklin.x
+                home.y = homePositions.franklin.y
+                break
+            }
+        }
         // recalc translation to keep map centered
         translation = {
-            x: canvas.width / 2 - (scale * img.width) / 2,
-            y: canvas.height / 2 - (scale * img.height) / 2
+            x: (canvas.width / 2) - ((scale * img.width) / 2) - home.x,
+            y: (canvas.height / 2) - ((scale * img.height) / 2) - home.y
         };
         scheduleRedraw();
     }
@@ -263,6 +281,13 @@ $(document).ready(() => {
 
 
     img.onload = () => {
+        switch (currentSchool) {
+            case 'franklin': {
+                scale = homePositions.franklin.scale
+                break;
+            }
+        }
+
         updateCanvasSize(); // set initial canvas size
 
         let isDragging = false;
@@ -371,8 +396,12 @@ $(document).ready(() => {
         }
 
         $('#nav-home').on('click', e => {
-            translation = { x: 0, y: 0 };
-            scale = 1;
+            switch (currentSchool) {
+                case 'franklin': {
+                    scale = homePositions.franklin.scale
+                    break;
+                }
+            }
             updateCanvasSize();
             scheduleRedraw();
         });
