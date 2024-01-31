@@ -23,6 +23,11 @@ $(document).ready(() => {
         refPointRadius: 2
     }
 
+    const labels = [
+        { id: "label-franklin", text: "Franklin", x: 1837, y: 1446, size: 50 },
+        { id: "label-track", text: "Track", x: 1827, y: 948, size: 30 },
+    ];
+
     const referencePoints = {
         franklin : [
             { x: 1646.21, y: 1230.18, lat: 45.502753693086014, lng: -122.60773267642072 },
@@ -132,14 +137,20 @@ $(document).ready(() => {
 
     // draw map on the canvas
     function drawMap() {
+        // wipe canvas before rendering
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.setTransform(scale, 0, 0, scale, translation.x, translation.y);
         ctx.drawImage(img, 0, 0, img.width, img.height);
 
+        // remder debug points
         if(debug.drawRefPoints)  {
             drawReferencePoints();
         }
 
+        // render labels
+        renderLabels(ctx, labels);
+
+        // render user position
         if(userCoords) {
             const transformParams = calculateTransformParameters(referencePoints.franklin);
 
@@ -177,6 +188,29 @@ $(document).ready(() => {
             ctx.arc(referencePoint.x, referencePoint.y, debug.refPointRadius / scale, 0, 2 * Math.PI);
             ctx.fill();
         }
+    }
+
+    function renderLabels(ctx, labels) {
+        ctx.fillStyle = "white";
+
+        labels.forEach(({ text, x, y, size }) => {
+            ctx.font = `${size}px monospace`;
+
+            const textWidth = ctx.measureText(text).width;
+            const centeredX = x - textWidth / 2;
+
+            ctx.fillText(text, centeredX, y);
+        });
+    }
+
+    function getTextHeight(font) {
+        const text = document.createElement('span');
+        text.textContent = 'F';
+        text.style.font = font;
+        document.body.appendChild(text);
+        const height = text.offsetHeight;
+        document.body.removeChild(text);
+        return height;
     }
 
     function calculateTransformParameters(referencePoints) {
@@ -235,12 +269,30 @@ $(document).ready(() => {
         let startCoords = { x: 0, y: 0 };
 
         // panning and zoomin
-        canvas.addEventListener('mousedown', startDrag);
         canvas.addEventListener('mousemove', drag);
         document.addEventListener('mouseup', endDrag);
         canvas.addEventListener('wheel', zoom);
 
         canvas.addEventListener('mousemove', handleMouseMove);
+
+
+        canvas.addEventListener("mousedown", function (e) {
+            startDrag(e);
+            labels.forEach(({ id, x, y, text }) => {
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = (e.clientX - rect.left - translation.x) / scale;
+                const mouseY = (e.clientY - rect.top - translation.y) / scale;
+
+                const textWidth = ctx.measureText(text).width * 1.75;
+                const textHeight = getTextHeight(ctx.font);
+
+                const centeredX = x - textWidth / 2;
+
+                if (mouseX > centeredX && mouseX < centeredX + textWidth && mouseY > y - textHeight && mouseY < y) {
+                    console.log(`clicked ${id}`)
+                }
+            });
+        });
 
         function handleMouseMove(event) {
             // debug shit
@@ -266,7 +318,7 @@ $(document).ready(() => {
 
 
         function startDrag(e) {
-            $('#map-canvas').css('cursor', 'move')
+            $('#map-canvas').css('cursor', 'grabbing')
             isDragging = true;
             startCoords = { x: e.clientX, y: e.clientY };
             scheduleRedraw();

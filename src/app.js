@@ -1,8 +1,8 @@
-import path from "path";
-import express from 'express';
-import passport from 'passport'
+const path = require("path");
+const express = require('express');
+const passport = require('passport');
 require('./auth');
-import * as dotenv from 'dotenv';
+const dotenv = require('dotenv');
 dotenv.config();
 
 const session = require('express-session')
