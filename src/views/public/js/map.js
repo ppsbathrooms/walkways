@@ -14,7 +14,7 @@ $(document).ready(() => {
 
     let userCoords =  null;
 
-    let grabbinMap = false;
+    let focusedOnBuilding = false;
 
     const navZoomMin = 0.3;
     const navZoomMax = 2.0;
@@ -53,6 +53,11 @@ $(document).ready(() => {
                 scale: 2    
             }
         }
+    }
+
+    let cursorState = {
+        dragging: false,
+        hovering: false
     }
 
     const labels = [
@@ -163,7 +168,6 @@ $(document).ready(() => {
             }
         }
         // recalc translation to keep map centered
-        // dis buggy
         goToPosition(home.x, home.y, scale, duration)
         scheduleRedraw();
     }
@@ -283,16 +287,18 @@ $(document).ready(() => {
     }
 
     function renderLabels(ctx, labels) {
-        ctx.fillStyle = "white";
-
-        labels.forEach(({ text, x, y, size }) => {
-            ctx.font = `${size}px monospace`;
-
-            const textWidth = ctx.measureText(text).width;
-            const centeredX = x - textWidth / 2;
-
-            ctx.fillText(text, centeredX, y);
-        });
+        if(!focusedOnBuilding) {
+            ctx.fillStyle = "white";
+    
+            labels.forEach(({ text, x, y, size }) => {
+                ctx.font = `${size}px monospace`;
+    
+                const textWidth = ctx.measureText(text).width;
+                const centeredX = x - textWidth / 2;
+    
+                ctx.fillText(text, centeredX, y);
+            });
+        }
     }
 
     function getTextHeight(font) {
@@ -383,6 +389,7 @@ $(document).ready(() => {
                 if (mouseX > centeredX && mouseX < centeredX + textWidth && mouseY > y - textHeight && mouseY < y) {
                     labelName = id.replace(/^label-/, '');
                     labelData = getLabelData(labelName)
+                    setFocus(true);
                     goToPosition(labelData.x, labelData.y, labelData.scale, 400)
                 }
             });
@@ -398,7 +405,7 @@ $(document).ready(() => {
             }
         }
 
-        function handleMouseMove(e) {
+        function hoveringLabel(e) {
             let somethingHovered = false
             labels.forEach(({ id, x, y, text }) => {
                 const rect = canvas.getBoundingClientRect();
@@ -411,16 +418,21 @@ $(document).ready(() => {
                 const centeredX = x - textWidth / 2;
 
                 if (mouseX > centeredX && mouseX < centeredX + textWidth && mouseY > y - textHeight && mouseY < y) {
-                    if(!somethingHovered) {
-                        somethingHovered = true;
+                    if (!somethingHovered) {
+                        somethingHovered = true;                
                     }
                 }
             });
-            if(somethingHovered) {
+            cursorState.hovering = somethingHovered;
+            return somethingHovered      
+        }
+
+        function handleMouseMove(e) {
+            if(hoveringLabel(e) && !focusedOnBuilding) {
                 $('#map-canvas').css('cursor', 'pointer');
             }
             else {
-                if(!grabbinMap) {
+                if(!cursorState.dragging) {
                     $('#map-canvas').css('cursor', 'auto');
                 }
             }
@@ -446,9 +458,17 @@ $(document).ready(() => {
 
         }
 
+        function setFocus(focused) {
+            if(focused != focusedOnBuilding) {
+
+                focusedOnBuilding = focused;
+                console.log(`focus set to ${focused}`)
+            }
+        } 
+
 
         function startDrag(e) {
-            grabbinMap = true;
+            cursorState.dragging = true;
             $('#map-canvas').css('cursor', 'grabbing')
             isDragging = true;
             startCoords = { x: e.clientX, y: e.clientY };
@@ -456,6 +476,7 @@ $(document).ready(() => {
         }
 
         function drag(e) {
+            setFocus(false);
             if (!isDragging) return;
             const dx = e.clientX - startCoords.x;
             const dy = e.clientY - startCoords.y;
@@ -465,9 +486,14 @@ $(document).ready(() => {
             scheduleRedraw();
         }
 
-        function endDrag() {
-            grabbinMap = false;
-            $('#map-canvas').css('cursor', 'auto')
+        function endDrag(e) {
+            cursorState.dragging = false;
+            if(cursorState.hovering && hoveringLabel(e) && !focusedOnBuilding) {
+                $('#map-canvas').css('cursor', 'pointer')
+            }
+            else {
+                $('#map-canvas').css('cursor', 'auto')
+            }
             isDragging = false;
         }
 

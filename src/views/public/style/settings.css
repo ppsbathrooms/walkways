@@ -29,6 +29,16 @@
     border-right: 1px solid #fff;
 }
 
+.settingsPanel {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.settingsPanel::-webkit-scrollbar {
+    display: none;
+}
+
+
 .settingsPanels .settingsPanel {
     position: fixed;
     right: 0;
