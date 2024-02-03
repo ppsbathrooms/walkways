@@ -2,22 +2,23 @@ $(document).ready(() => {
     const canvas = $('#map-canvas')[0];
     const ctx = canvas.getContext('2d');
 
-    const svgFile = '/maps/franklin.svg';
-    const img = new Image();
-    img.src = svgFile;
+    currentSchool = 'franklin';
+    currentFloor = 1;
+    currentBuilding = null;
 
-    currentSchool = 'franklin'
+    const map = new Image();
+    map.src = `/maps/${currentSchool}/${currentSchool}Map.svg`;
 
     let scale = 1;
     let redrawScheduled = false;
     let translation = { x: 0, y: 0 };
 
-    let userCoords =  null;
+    let userCoords = null;
 
     let focusedOnBuilding = false;
 
     const navZoomMin = 0.3;
-    const navZoomMax = 2.0;
+    const navZoomMax = 3.0;
 
     const debug = {
         mouseCoords: false,
@@ -26,10 +27,34 @@ $(document).ready(() => {
         userCoords: false,
         refPointRadius: 2
     }
-    
+
+    // number of floors per building / position of svg
+    const floors = {
+        franklin: {
+            franklin: {
+                floors: 4,
+                position: {
+                    x: 1434.58,
+                    y: 1230.18
+                }
+            },
+            gym: {
+                floors: 3,
+                position: {
+                    x: 1975,
+                    y: 793
+                }
+            }
+        },
+        cleveland: {
+
+        }
+
+    }
+
     const homePositions = {
         franklin: {
-            x: -75, 
+            x: -75,
             y: -120,
             scale: 0.75
         }
@@ -38,19 +63,19 @@ $(document).ready(() => {
     const labelPositions = {
         franklin: {
             franklin: {
-                x: -75, 
+                x: -75,
                 y: 150,
                 scale: 1.5
             },
             gym: {
                 x: 500,
                 y: -1400,
-                scale: 3 
+                scale: 3
             },
             track: {
-                x: -100, 
+                x: -100,
                 y: -700,
-                scale: 2    
+                scale: 2
             }
         }
     }
@@ -60,27 +85,29 @@ $(document).ready(() => {
         hovering: false
     }
 
-    const labels = [
-        { id: "label-franklin", text: "Franklin", x: 1837, y: 1446, size: 50 },
-        { id: "label-track", text: "Track", x: 1830, y: 948, size: 30 },
-        { id: "label-gym", text: "Gym", x: 2023, y: 895, size: 30 },
-    ];
+    const labels = {
+        franklin: [
+            { id: "label-franklin", text: "Franklin", x: 1837, y: 1446, size: 50 },
+            { id: "label-track", text: "Track", x: 1830, y: 948, size: 30 },
+            { id: "label-gym", text: "Gym", x: 2023, y: 895, size: 30 },
+        ]
+    };
 
     const referencePoints = {
-        franklin : [
+        franklin: [
             { x: 1646.21, y: 1230.18, lat: 45.502753693086014, lng: -122.60773267642072 },
-            { x: 1709.40, y: 1607.79, lat: 45.501580327311395, lng: -122.60747230138658  },
+            { x: 1709.40, y: 1607.79, lat: 45.501580327311395, lng: -122.60747230138658 },
             { x: 1711.15, y: 1230.39, lat: 45.50275598013354, lng: -122.60744278116181 },
             { x: 683.39, y: 327.56, lat: 45.50565802270125, lng: -122.61210386372252 },
             { x: 3200.98, y: 2483.79, lat: 45.49878086221833, lng: -122.60075043228514 },
             { x: 2066.50, y: 793.75, lat: 45.50416316877892, lng: -122.60585572095987 },
             { x: 2563.13, y: 489.38, lat: 45.50510957953357, lng: -122.60360829125972 },
             { x: 701.04, y: 1758.26, lat: 45.501085257407006, lng: -122.61204860136078 },
-            { x: 1700.19, y: 766.95, lat: 45.504230361926844, lng: -122.60753101363174},
-            { x: 1977.18, y: 793.47, lat: 45.50412907956996, lng: -122.60626596589613},
-            { x: 2936.03, y: 1050.57, lat: 45.503338740168346, lng: -122.60191204876772},
-            { x: 1932.64, y: 1390.31, lat: 45.50223980847806, lng: -122.60643339865355},
-        ] 
+            { x: 1700.19, y: 766.95, lat: 45.504230361926844, lng: -122.60753101363174 },
+            { x: 1977.18, y: 793.47, lat: 45.50412907956996, lng: -122.60626596589613 },
+            { x: 2936.03, y: 1050.57, lat: 45.503338740168346, lng: -122.60191204876772 },
+            { x: 1932.64, y: 1390.31, lat: 45.50223980847806, lng: -122.60643339865355 },
+        ]
     }
 
 
@@ -89,77 +116,77 @@ $(document).ready(() => {
     var locationUpdateInterval = setInterval(updateUserLocation, 10000);
 
     function updateUserLocation() {
-        if(!updateUserCoords) {
+        if (!updateUserCoords) {
             return;
         }
         navigator.geolocation.getCurrentPosition(
-            function(position) {
-            var userLocation = {
-                lat: position.coords.latitude,
-                lng: position.coords.longitude
-            };
-            if(debug.userCoords) {
-                console.log('User location:', userLocation);                
-            }
+            function (position) {
+                var userLocation = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+                if (debug.userCoords) {
+                    console.log('User location:', userLocation);
+                }
 
                 userCoords = userLocation;
                 updateCoords(userLocation)
                 drawMap();
             },
-            function(error) {
-            console.error('Error getting user location:', error.message);
+            function (error) {
+                console.error('Error getting user location:', error.message);
             }
         );
     }
 
     if (navigator.permissions) {
-    navigator.permissions.query({ name: 'geolocation' })
-        .then(permissionStatus => {
-        if (permissionStatus.state === 'granted') {
-            // user has already given access to their location
-            navigator.geolocation.getCurrentPosition(
-            function(position) {
-                var userLocation = {
-                    lat: position.coords.latitude,
-                    lng: position.coords.longitude
-                };
+        navigator.permissions.query({ name: 'geolocation' })
+            .then(permissionStatus => {
+                if (permissionStatus.state === 'granted') {
+                    // user has already given access to their location
+                    navigator.geolocation.getCurrentPosition(
+                        function (position) {
+                            var userLocation = {
+                                lat: position.coords.latitude,
+                                lng: position.coords.longitude
+                            };
 
-                // userLocation = {
-                //     lat: 45.502204, 
-                //     lng: -122.606125
-                // } // coords to test with, ignore dis
-                updateUserCoords = true;
-                userCoords = userLocation;
-                drawMap();
-            },
-            function(error) {
-                console.error('Error getting user location:', error.message);
-            }
-            );
-        } else if (permissionStatus.state === 'prompt') {
-            // console.log('location permission prompt not answered yet');
-        } else {
-            // console.log('location permission denied');
-        }
-        })
-        .catch(error => {
-        console.error('Error checking location permission:', error.message);
-        });
+                            // userLocation = {
+                            //     lat: 45.502204, 
+                            //     lng: -122.606125
+                            // } // coords to test with, ignore dis
+                            updateUserCoords = true;
+                            userCoords = userLocation;
+                            drawMap();
+                        },
+                        function (error) {
+                            console.error('Error getting user location:', error.message);
+                        }
+                    );
+                } else if (permissionStatus.state === 'prompt') {
+                    // console.log('location permission prompt not answered yet');
+                } else {
+                    // console.log('location permission denied');
+                }
+            })
+            .catch(error => {
+                console.error('Error checking location permission:', error.message);
+            });
     } else {
-    // geolocation permissions API is not supported by the browser
-    console.error('Geolocation is not supported by this browser.');
+        // geolocation permissions API is not supported by the browser
+        console.error('Geolocation is not supported by this browser.');
     }
 
     // update canvas size to window size
     function updateCanvasSize(duration) {
 
-        if(!duration) {
+        if (!duration) {
             duration = false;
         }
 
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
-        let home = {x: 0, y: 0};
+        let home = { x: 0, y: 0 };
         switch (currentSchool) {
             case 'franklin': {
                 home.x = homePositions.franklin.x
@@ -181,8 +208,8 @@ $(document).ready(() => {
             const initialScale = scale;
             const initialTranslationX = translation.x;
             const initialTranslationY = translation.y;
-            const targetTranslationX = (canvas.width / 2) - ((newScale * img.width) / 2) - x;
-            const targetTranslationY = (canvas.height / 2) - ((newScale * img.height) / 2) - y;
+            const targetTranslationX = (canvas.width / 2) - ((newScale * map.width) / 2) - x;
+            const targetTranslationY = (canvas.height / 2) - ((newScale * map.height) / 2) - y;
             let startTime;
 
             function easeOut(t) {
@@ -212,8 +239,8 @@ $(document).ready(() => {
         } else {
             scale = newScale;
             translation = {
-                x: (canvas.width / 2) - ((scale * img.width) / 2) - x,
-                y: (canvas.height / 2) - ((scale * img.height) / 2) - y
+                x: (canvas.width / 2) - ((scale * map.width) / 2) - x,
+                y: (canvas.height / 2) - ((scale * map.height) / 2) - y
             };
             scheduleRedraw();
         }
@@ -236,10 +263,26 @@ $(document).ready(() => {
         // wipe canvas before rendering
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.setTransform(scale, 0, 0, scale, translation.x, translation.y);
-        ctx.drawImage(img, 0, 0, img.width, img.height);
+        ctx.drawImage(map, 0, 0, map.width, map.height);
 
-        // remder debug points
-        if(debug.drawRefPoints)  {
+        if(focusedOnBuilding) {
+            if (floors.hasOwnProperty(currentSchool)) {
+                var currentFloors = floors[currentSchool];
+                if (currentFloors.hasOwnProperty(currentBuilding)) {
+                    var building = currentFloors[currentBuilding]
+                    var buildingX = building.position.x;
+                    var buildingY = building.position.y;
+
+                    const floorMap = new Image();
+                    floorMap.src = `/maps/${currentSchool}/${currentBuilding}/${currentBuilding}${currentFloor}.svg`;
+
+                    ctx.drawImage(floorMap, buildingX, buildingY);
+                }                
+            }
+        }
+
+        // render debug points
+        if (debug.drawRefPoints) {
             drawReferencePoints();
         }
 
@@ -247,26 +290,26 @@ $(document).ready(() => {
         renderLabels(ctx, labels);
 
         // render user position
-        if(userCoords) {
+        if (userCoords) {
             const transformParams = calculateTransformParameters(referencePoints.franklin);
 
             canvasCoords = convertCoordinatesToCanvas(userCoords.lat, userCoords.lng, transformParams)
-        
+
             const outerDotSize = 15 / scale;
-            ctx.fillStyle = 'rgba(66, 133, 250, 0.2)'; 
+            ctx.fillStyle = 'rgba(66, 133, 250, 0.2)';
             ctx.beginPath();
             ctx.arc(canvasCoords.canvasX, canvasCoords.canvasY, outerDotSize, 0, 2 * Math.PI);
             ctx.fill();
 
             const borderDotSize = 7 / scale;
-            ctx.fillStyle = 'white'; 
+            ctx.fillStyle = 'white';
             ctx.beginPath();
             ctx.arc(canvasCoords.canvasX, canvasCoords.canvasY, borderDotSize, 0, 2 * Math.PI);
             ctx.fill();
 
             const dotSize = 5 / scale;
 
-            ctx.fillStyle = 'rgba(66, 133, 250, 1)'; 
+            ctx.fillStyle = 'rgba(66, 133, 250, 1)';
             ctx.beginPath();
             ctx.arc(canvasCoords.canvasX, canvasCoords.canvasY, dotSize, 0, 2 * Math.PI);
             ctx.fill();
@@ -279,7 +322,7 @@ $(document).ready(() => {
     function drawReferencePoints() {
 
         for (const referencePoint of referencePoints.franklin) {
-            ctx.fillStyle = 'red'; 
+            ctx.fillStyle = 'red';
             ctx.beginPath();
             ctx.arc(referencePoint.x, referencePoint.y, debug.refPointRadius / scale, 0, 2 * Math.PI);
             ctx.fill();
@@ -287,17 +330,23 @@ $(document).ready(() => {
     }
 
     function renderLabels(ctx, labels) {
-        if(!focusedOnBuilding) {
+        if (!focusedOnBuilding) {
             ctx.fillStyle = "white";
-    
-            labels.forEach(({ text, x, y, size }) => {
-                ctx.font = `${size}px monospace`;
-    
-                const textWidth = ctx.measureText(text).width;
-                const centeredX = x - textWidth / 2;
-    
-                ctx.fillText(text, centeredX, y);
-            });
+
+            if (labels.hasOwnProperty(currentSchool)) {
+                var currentLabels = labels[currentSchool];
+
+                currentLabels.forEach(({ text, x, y, size }) => {
+                    ctx.font = `${size}px monospace`;
+
+                    const textWidth = ctx.measureText(text).width;
+                    const centeredX = x - textWidth / 2;
+
+                    ctx.fillText(text, centeredX, y);
+                });
+            } else {
+                return null;
+            }
         }
     }
 
@@ -360,7 +409,7 @@ $(document).ready(() => {
     }
 
 
-    img.onload = () => {
+    map.onload = () => {
         scale = homePositions.franklin.scale
         updateCanvasSize(); // set initial canvas size
         let isDragging = false;
@@ -376,24 +425,30 @@ $(document).ready(() => {
 
         canvas.addEventListener("mousedown", function (e) {
             startDrag(e);
-            labels.forEach(({ id, x, y, text }) => {
-                const rect = canvas.getBoundingClientRect();
-                const mouseX = (e.clientX - rect.left - translation.x) / scale;
-                const mouseY = (e.clientY - rect.top - translation.y) / scale;
 
-                const textWidth = ctx.measureText(text).width * 1.75;
-                const textHeight = getTextHeight(ctx.font);
+            if (labels.hasOwnProperty(currentSchool)) {
+                var currentLabels = labels[currentSchool];
 
-                const centeredX = x - textWidth / 2;
+                currentLabels.forEach(({ id, x, y, text }) => {
+                    const rect = canvas.getBoundingClientRect();
+                    const mouseX = (e.clientX - rect.left - translation.x) / scale;
+                    const mouseY = (e.clientY - rect.top - translation.y) / scale;
 
-                if (mouseX > centeredX && mouseX < centeredX + textWidth && mouseY > y - textHeight && mouseY < y) {
-                    labelName = id.replace(/^label-/, '');
-                    labelData = getLabelData(labelName)
-                    setFocus(true);
-                    goToPosition(labelData.x, labelData.y, labelData.scale, 400)
-                }
-            });
-        
+                    const textWidth = ctx.measureText(text).width * 1.75;
+                    const textHeight = getTextHeight(ctx.font);
+
+                    const centeredX = x - textWidth / 2;
+
+                    if (mouseX > centeredX && mouseX < centeredX + textWidth && mouseY > y - textHeight && mouseY < y) {
+                        labelName = currentBuilding = id.replace(/^label-/, '');
+                        labelData = getLabelData(labelName)
+                        setFocus(true);
+                        goToPosition(labelData.x, labelData.y, labelData.scale, 400)
+                    }
+                });
+            } else {
+                return null;
+            }
         });
 
         function getLabelData(schoolName) {
@@ -407,32 +462,40 @@ $(document).ready(() => {
 
         function hoveringLabel(e) {
             let somethingHovered = false
-            labels.forEach(({ id, x, y, text }) => {
-                const rect = canvas.getBoundingClientRect();
-                const mouseX = (e.clientX - rect.left - translation.x) / scale;
-                const mouseY = (e.clientY - rect.top - translation.y) / scale;
+            if (labels.hasOwnProperty(currentSchool) && !focusedOnBuilding) {
+                var currentLabels = labels[currentSchool];
 
-                const textWidth = ctx.measureText(text).width * 1.75;
-                const textHeight = getTextHeight(ctx.font);
+                currentLabels.forEach(({ id, x, y, text }) => {
+                    const rect = canvas.getBoundingClientRect();
+                    const mouseX = (e.clientX - rect.left - translation.x) / scale;
+                    const mouseY = (e.clientY - rect.top - translation.y) / scale;
 
-                const centeredX = x - textWidth / 2;
+                    const textWidth = ctx.measureText(text).width * 1.75;
+                    const textHeight = getTextHeight(ctx.font);
 
-                if (mouseX > centeredX && mouseX < centeredX + textWidth && mouseY > y - textHeight && mouseY < y) {
-                    if (!somethingHovered) {
-                        somethingHovered = true;                
+                    const centeredX = x - textWidth / 2;
+
+                    if (mouseX > centeredX && mouseX < centeredX + textWidth && mouseY > y - textHeight && mouseY < y) {
+                        if (!somethingHovered) {
+                            somethingHovered = true;
+                        }
                     }
-                }
-            });
+                });
+
+            } else {
+                return null;
+            }
+
             cursorState.hovering = somethingHovered;
-            return somethingHovered      
+            return somethingHovered
         }
 
         function handleMouseMove(e) {
-            if(hoveringLabel(e) && !focusedOnBuilding) {
+            if (hoveringLabel(e) && !focusedOnBuilding) {
                 $('#map-canvas').css('cursor', 'pointer');
             }
             else {
-                if(!cursorState.dragging) {
+                if (!cursorState.dragging) {
                     $('#map-canvas').css('cursor', 'auto');
                 }
             }
@@ -446,7 +509,7 @@ $(document).ready(() => {
                 console.log(`${mouseX.toFixed(2)}, ${mouseY.toFixed(2)}`);
             }
 
-            if(debug.mouseLocation) {
+            if (debug.mouseLocation) {
                 const mouseX = (e.clientX - rect.left) / scale - translation.x / scale;
                 const mouseY = (e.clientY - rect.top) / scale - translation.y / scale;
 
@@ -459,12 +522,10 @@ $(document).ready(() => {
         }
 
         function setFocus(focused) {
-            if(focused != focusedOnBuilding) {
-
+            if (focused != focusedOnBuilding) {
                 focusedOnBuilding = focused;
-                console.log(`focus set to ${focused}`)
             }
-        } 
+        }
 
 
         function startDrag(e) {
@@ -476,8 +537,8 @@ $(document).ready(() => {
         }
 
         function drag(e) {
-            setFocus(false);
             if (!isDragging) return;
+            setFocus(false);
             const dx = e.clientX - startCoords.x;
             const dy = e.clientY - startCoords.y;
             translation.x += dx;
@@ -488,7 +549,7 @@ $(document).ready(() => {
 
         function endDrag(e) {
             cursorState.dragging = false;
-            if(cursorState.hovering && hoveringLabel(e) && !focusedOnBuilding) {
+            if (cursorState.hovering && hoveringLabel(e) && !focusedOnBuilding) {
                 $('#map-canvas').css('cursor', 'pointer')
             }
             else {
@@ -503,9 +564,13 @@ $(document).ready(() => {
             // calc new scale
             // const newScale = Math.max(navZoomMin, Math.min(navZoomMax, scale * scaleFactor));
             const newScale = scale * scaleFactor
-            // if (newScale === navZoomMin || newScale === navZoomMax) {
+            // if (newScale < navZoomMin || newScale > navZoomMax) {
                 // return; // do nothing at scale limits
             // }
+
+            if (focusedOnBuilding) {
+                setFocus(false)
+            }
 
             const cursor = getCursorPosition(e);
             // calc the adjustment to keep the cursor fixed
@@ -529,12 +594,14 @@ $(document).ready(() => {
         }
 
         $('#nav-home').on('click', e => {
+            setFocus(false);
             scale = homePositions.franklin.scale
             updateCanvasSize(400);
             scheduleRedraw();
         });
 
         $('#nav-plus').on('click', e => {
+            setFocus(false);
             const scaleFactor = 1.25;
             const cursor = { x: canvas.width / 2, y: canvas.height / 2 };
             const newScale = Math.max(navZoomMin, Math.min(navZoomMax, scale * scaleFactor));
@@ -547,6 +614,7 @@ $(document).ready(() => {
         });
 
         $('#nav-minus').on('click', e => {
+            setFocus(false);
             const scaleFactor = 0.75;
             const cursor = { x: canvas.width / 2, y: canvas.height / 2 };
             const newScale = Math.max(navZoomMin, Math.min(navZoomMax, scale * scaleFactor));
@@ -593,7 +661,7 @@ $(document).ready(() => {
     };
 
     $('.debug-menu input[type="checkbox"]').change(function () {
-        const checkboxId = $(this).parent().index(); 
+        const checkboxId = $(this).parent().index();
         switch (checkboxId) {
             case 2:
                 debug.drawRefPoints = $(this).prop('checked');
@@ -623,7 +691,7 @@ $(document).ready(() => {
 });
 
 
-$(document).keydown(function(e) {
+$(document).keydown(function (e) {
     if (e.key === '`' || e.key === '`') {
         $('.debug-menu').fadeToggle(100);
         // $('#content-fade').fadeToggle(100);
