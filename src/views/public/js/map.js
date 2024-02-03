@@ -32,6 +32,7 @@ $(document).ready(() => {
     const floors = {
         franklin: {
             franklin: {
+                filename: 'franklin',
                 floors: 4,
                 position: {
                     x: 1434.58,
@@ -39,10 +40,19 @@ $(document).ready(() => {
                 }
             },
             gym: {
+                filename: 'gym',
                 floors: 3,
                 position: {
                     x: 1975,
                     y: 793
+                }
+            },
+            track: {
+                filename: null,
+                floors: 1,
+                position: {
+                    x: null,
+                    y: null,
                 }
             }
         },
@@ -266,18 +276,14 @@ $(document).ready(() => {
         ctx.drawImage(map, 0, 0, map.width, map.height);
 
         if(focusedOnBuilding) {
-            if (floors.hasOwnProperty(currentSchool)) {
-                var currentFloors = floors[currentSchool];
-                if (currentFloors.hasOwnProperty(currentBuilding)) {
-                    var building = currentFloors[currentBuilding]
-                    var buildingX = building.position.x;
-                    var buildingY = building.position.y;
+            var buildingX = currentBuilding.position.x;
+            var buildingY = currentBuilding.position.y;
 
-                    const floorMap = new Image();
-                    floorMap.src = `/maps/${currentSchool}/${currentBuilding}/${currentBuilding}${currentFloor}.svg`;
+            if(currentBuilding.filename != null) {
+                const floorMap = new Image();
+                floorMap.src = `/maps/${currentSchool}/${currentBuilding.filename}/${currentBuilding.filename}${currentFloor}.svg`;
 
-                    ctx.drawImage(floorMap, buildingX, buildingY);
-                }                
+                ctx.drawImage(floorMap, buildingX, buildingY);
             }
         }
 
@@ -426,29 +432,24 @@ $(document).ready(() => {
         canvas.addEventListener("mousedown", function (e) {
             startDrag(e);
 
-            if (labels.hasOwnProperty(currentSchool)) {
-                var currentLabels = labels[currentSchool];
+            labels[currentSchool].forEach(({ id, x, y, text }) => {
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = (e.clientX - rect.left - translation.x) / scale;
+                const mouseY = (e.clientY - rect.top - translation.y) / scale;
 
-                currentLabels.forEach(({ id, x, y, text }) => {
-                    const rect = canvas.getBoundingClientRect();
-                    const mouseX = (e.clientX - rect.left - translation.x) / scale;
-                    const mouseY = (e.clientY - rect.top - translation.y) / scale;
+                const textWidth = ctx.measureText(text).width * 1.75;
+                const textHeight = getTextHeight(ctx.font);
 
-                    const textWidth = ctx.measureText(text).width * 1.75;
-                    const textHeight = getTextHeight(ctx.font);
+                const centeredX = x - textWidth / 2;
 
-                    const centeredX = x - textWidth / 2;
-
-                    if (mouseX > centeredX && mouseX < centeredX + textWidth && mouseY > y - textHeight && mouseY < y) {
-                        labelName = currentBuilding = id.replace(/^label-/, '');
-                        labelData = getLabelData(labelName)
-                        setFocus(true);
-                        goToPosition(labelData.x, labelData.y, labelData.scale, 400)
-                    }
-                });
-            } else {
-                return null;
-            }
+                if (mouseX > centeredX && mouseX < centeredX + textWidth && mouseY > y - textHeight && mouseY < y) {
+                    labelName = id.replace(/^label-/, '');
+                    currentBuilding = floors[currentSchool][labelName]
+                    labelData = getLabelData(labelName)
+                    setFocus(true);
+                    goToPosition(labelData.x, labelData.y, labelData.scale, 400)
+                }
+            });
         });
 
         function getLabelData(schoolName) {
@@ -524,6 +525,14 @@ $(document).ready(() => {
         function setFocus(focused) {
             if (focused != focusedOnBuilding) {
                 focusedOnBuilding = focused;
+
+                const selector = $('#floor-selector')
+                selector.empty();
+                for (var i = 0; i < currentBuilding.floors; i++) {
+                    $('#floor-selector').append(`<div ${i==0 ? 'class="selected-floor"' : ''}>${i+1}</div>`)
+                }
+                if(focused) {selector.fadeIn(200);}
+                else {selector.fadeOut(100);}
             }
         }
 
@@ -687,7 +696,6 @@ $(document).ready(() => {
         $('#ref-point-size-display').html(Number(val).toFixed(1));
         drawMap();
     });
-
 });
 
 
@@ -697,6 +705,18 @@ $(document).keydown(function (e) {
         // $('#content-fade').fadeToggle(100);
     }
 });
+
+$('#floor-selector').on('click', 'div', function(e) {
+    $('#floor-selector div.selected-floor').removeClass('selected-floor');
+    $(this).addClass('selected-floor');
+
+
+    // do this once we have the different floors to swap dem
+    // currentFloor = $(this).html() 
+    // drawMap();
+});
+
+
 
 function updateCoords(coords) {
     $('#debug-user-coords').html(`${coords.lat}, ${coords.lng}`)
@@ -732,3 +752,10 @@ var debugShit = `
       <p id="debug-user-coords">user coords: null</p>`
 
 $('.debug-menu').html(debugShit)
+
+var floorSelector = `
+<div>2</div>
+
+`
+
+$('#floor-selector').html(floorSelector);
