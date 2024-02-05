@@ -529,7 +529,7 @@ $(document).ready(() => {
                 const selector = $('#floor-selector')
                 selector.empty();
                 for (var i = 0; i < currentBuilding.floors; i++) {
-                    $('#floor-selector').append(`<div ${i==0 ? 'class="selected-floor"' : ''}>${i+1}</div>`)
+                    $('#floor-selector').append(`<div ${i == currentFloor - 1 ? 'class="selected-floor"' : ''}>${i+1}</div>`)
                 }
                 if(focused) {selector.fadeIn(200);}
                 else {selector.fadeOut(100);}
@@ -696,6 +696,16 @@ $(document).ready(() => {
         $('#ref-point-size-display').html(Number(val).toFixed(1));
         drawMap();
     });
+
+    $('#floor-selector').on('click', 'div', function(e) {
+        $('#floor-selector div.selected-floor').removeClass('selected-floor');
+        $(this).addClass('selected-floor');
+
+        currentFloor = $(this).html() 
+        console.log(currentFloor)
+        drawMap();
+    });
+
 });
 
 
@@ -705,17 +715,6 @@ $(document).keydown(function (e) {
         // $('#content-fade').fadeToggle(100);
     }
 });
-
-$('#floor-selector').on('click', 'div', function(e) {
-    $('#floor-selector div.selected-floor').removeClass('selected-floor');
-    $(this).addClass('selected-floor');
-
-
-    // do this once we have the different floors to swap dem
-    // currentFloor = $(this).html() 
-    // drawMap();
-});
-
 
 
 function updateCoords(coords) {
