@@ -268,16 +268,6 @@ $(document).ready(() => {
         updateCanvasSize(false)
     });
 
-    function fileExists(image_url){
-
-        var http = new XMLHttpRequest();
-    
-        http.open('HEAD', image_url, false);
-        http.send();
-    
-        return http.status != 404;
-    }
-
     // draw map on the canvas
     function drawMap() {
         // wipe canvas before rendering
@@ -293,10 +283,9 @@ $(document).ready(() => {
                 const floorMap = new Image();
 
                 const url = `/maps/${currentSchool}/${currentBuilding.filename}/${currentBuilding.filename}${currentFloor}.svg`;
-                if (fileExists(url)) {
-                    floorMap.src = `/maps/${currentSchool}/${currentBuilding.filename}/${currentBuilding.filename}${currentFloor}.svg`;
-                    ctx.drawImage(floorMap, buildingX, buildingY);
-                }
+
+                floorMap.src = `/maps/${currentSchool}/${currentBuilding.filename}/${currentBuilding.filename}${currentFloor}.svg`;
+                ctx.drawImage(floorMap, buildingX, buildingY);
             }
         }
 
