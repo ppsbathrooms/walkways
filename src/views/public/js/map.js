@@ -33,7 +33,7 @@ $(document).ready(() => {
         franklin: {
             franklin: {
                 filename: 'franklin',
-                floors: 4,
+                floors: 3,
                 position: {
                     x: 1434.58,
                     y: 1230.18
