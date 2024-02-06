@@ -34,6 +34,8 @@ $(document).ready(() => {
             franklin: {
                 filename: 'franklin',
                 floors: 3,
+                floorStart: 1,
+                zoomEscape: 1.25,
                 position: {
                     x: 1434.58,
                     y: 1230.18
@@ -42,6 +44,8 @@ $(document).ready(() => {
             gym: {
                 filename: 'gym',
                 floors: 3,
+                floorStart: 0,
+                zoomEscape: 1.5,
                 position: {
                     x: 1975,
                     y: 793
@@ -50,6 +54,8 @@ $(document).ready(() => {
             track: {
                 filename: null,
                 floors: 1,
+                floorStart: 1,
+                zoomEscape: 1.5,
                 position: {
                     x: null,
                     y: null,
@@ -273,7 +279,9 @@ $(document).ready(() => {
         // wipe canvas before rendering
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.setTransform(scale, 0, 0, scale, translation.x, translation.y);
+        ctx.filter = `brightness(${focusedOnBuilding ? 0.5 : 1})`;
         ctx.drawImage(map, 0, 0, map.width, map.height);
+      ctx.filter = 'none';
 
         if(focusedOnBuilding) {
             var buildingX = currentBuilding.position.x;
@@ -535,7 +543,7 @@ $(document).ready(() => {
                 const selector = $('#floor-selector')
                 selector.empty();
                 for (var i = 0; i < currentBuilding.floors; i++) {
-                    $('#floor-selector').append(`<div ${i == currentFloor - 1 ? 'class="selected-floor"' : ''}>${i+1}</div>`)
+                    $('#floor-selector').append(`<div ${i == currentFloor - ((currentBuilding.floorStart == 0) ? 0 : 1) ? 'class="selected-floor"' : ''}>${i + currentBuilding.floorStart}</div>`)
                 }
                 if(focused) {selector.fadeIn(200);}
                 else {selector.fadeOut(100);}
@@ -553,7 +561,7 @@ $(document).ready(() => {
 
         function drag(e) {
             if (!isDragging) return;
-            setFocus(false);
+            // setFocus(false);
             const dx = e.clientX - startCoords.x;
             const dy = e.clientY - startCoords.y;
             translation.x += dx;
@@ -583,7 +591,7 @@ $(document).ready(() => {
                 // return; // do nothing at scale limits
             // }
 
-            if (focusedOnBuilding) {
+            if (focusedOnBuilding && newScale <= currentBuilding.zoomEscape) {
                 setFocus(false)
             }
 
@@ -616,7 +624,6 @@ $(document).ready(() => {
         });
 
         $('#nav-plus').on('click', e => {
-            setFocus(false);
             const scaleFactor = 1.25;
             const cursor = { x: canvas.width / 2, y: canvas.height / 2 };
             const newScale = Math.max(navZoomMin, Math.min(navZoomMax, scale * scaleFactor));
@@ -629,10 +636,13 @@ $(document).ready(() => {
         });
 
         $('#nav-minus').on('click', e => {
-            setFocus(false);
             const scaleFactor = 0.75;
             const cursor = { x: canvas.width / 2, y: canvas.height / 2 };
             const newScale = Math.max(navZoomMin, Math.min(navZoomMax, scale * scaleFactor));
+
+            if (focusedOnBuilding && newScale <= currentBuilding.zoomEscape) {
+                setFocus(false)
+            }
 
             translation.x = cursor.x - (cursor.x - translation.x) * newScale / scale;
             translation.y = cursor.y - (cursor.y - translation.y) * newScale / scale;
