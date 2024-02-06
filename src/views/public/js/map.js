@@ -281,8 +281,10 @@ $(document).ready(() => {
 
             if(currentBuilding.filename != null) {
                 const floorMap = new Image();
-                floorMap.src = `/maps/${currentSchool}/${currentBuilding.filename}/${currentBuilding.filename}${currentFloor}.svg`;
 
+                const url = `/maps/${currentSchool}/${currentBuilding.filename}/${currentBuilding.filename}${currentFloor}.svg`;
+
+                floorMap.src = `/maps/${currentSchool}/${currentBuilding.filename}/${currentBuilding.filename}${currentFloor}.svg`;
                 ctx.drawImage(floorMap, buildingX, buildingY);
             }
         }
@@ -445,6 +447,10 @@ $(document).ready(() => {
                 if (mouseX > centeredX && mouseX < centeredX + textWidth && mouseY > y - textHeight && mouseY < y) {
                     labelName = id.replace(/^label-/, '');
                     currentBuilding = floors[currentSchool][labelName]
+                    
+                    // clamp to a floor that exists in this building
+                    currentFloor = Math.min(currentFloor, currentBuilding.floors);
+
                     labelData = getLabelData(labelName)
                     setFocus(true);
                     goToPosition(labelData.x, labelData.y, labelData.scale, 400)
