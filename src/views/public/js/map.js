@@ -16,6 +16,7 @@ $(document).ready(() => {
     let userCoords = null;
 
     let focusedOnBuilding = false;
+    let currentFloorImage = null;
 
     const navZoomMin = 0.3;
     const navZoomMax = 3.0;
@@ -287,13 +288,18 @@ $(document).ready(() => {
             var buildingX = currentBuilding.position.x;
             var buildingY = currentBuilding.position.y;
 
-            if(currentBuilding.filename != null) {
-                const floorMap = new Image();
+            if (currentFloorImage == null) {
+                if(currentBuilding.filename != null) {
+                    currentFloorImage = new Image();
 
-                const url = `/maps/${currentSchool}/${currentBuilding.filename}/${currentBuilding.filename}${currentFloor}.svg`;
+                    const url = `/maps/${currentSchool}/${currentBuilding.filename}/${currentBuilding.filename}${currentFloor}.svg`;
 
-                floorMap.src = `/maps/${currentSchool}/${currentBuilding.filename}/${currentBuilding.filename}${currentFloor}.svg`;
-                ctx.drawImage(floorMap, buildingX, buildingY);
+                    currentFloorImage.src = url;
+                }
+            }
+
+            if (currentFloorImage != null) {
+                ctx.drawImage(currentFloorImage, buildingX, buildingY);
             }
         }
 
@@ -455,6 +461,8 @@ $(document).ready(() => {
                 if (mouseX > centeredX && mouseX < centeredX + textWidth && mouseY > y - textHeight && mouseY < y) {
                     labelName = id.replace(/^label-/, '');
                     currentBuilding = floors[currentSchool][labelName]
+
+                    currentFloorImage = null
                     
                     // clamp to a floor that exists in this building
                     currentFloor = Math.min(currentFloor, currentBuilding.floors);
@@ -717,8 +725,10 @@ $(document).ready(() => {
         $('#floor-selector div.selected-floor').removeClass('selected-floor');
         $(this).addClass('selected-floor');
 
-        currentFloor = $(this).html() 
-        console.log(currentFloor)
+        currentFloor = $(this).html();
+        console.log(currentFloor);
+        currentFloorImage = null;
+
         drawMap();
     });
 
