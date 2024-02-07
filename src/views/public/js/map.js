@@ -282,7 +282,7 @@ $(document).ready(() => {
         ctx.setTransform(scale, 0, 0, scale, translation.x, translation.y);
         ctx.filter = `brightness(${focusedOnBuilding ? 0.5 : 1})`;
         ctx.drawImage(map, 0, 0, map.width, map.height);
-      ctx.filter = 'none';
+        ctx.filter = 'none';
 
         if(focusedOnBuilding) {
             var buildingX = currentBuilding.position.x;
@@ -465,7 +465,7 @@ $(document).ready(() => {
                     currentFloorImage = null
                     
                     // clamp to a floor that exists in this building
-                    currentFloor = Math.min(currentFloor, currentBuilding.floors);
+                    currentFloor = Math.max(Math.min(currentFloor, currentBuilding.floors), currentBuilding.floorStart);
 
                     labelData = getLabelData(labelName)
                     setFocus(true);
