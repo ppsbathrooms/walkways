@@ -18,6 +18,8 @@ $(document).ready(() => {
     let focusedOnBuilding = false;
     let currentFloorImage = null;
 
+    let currentFloorImages = {};
+
     const navZoomMin = 0.3;
     const navZoomMax = 3.0;
 
@@ -35,7 +37,7 @@ $(document).ready(() => {
             franklin: {
                 filename: 'franklin',
                 floors: 3,
-                floorStart: 1,
+                floorStart: 0,
                 zoomEscape: 1.25,
                 position: {
                     x: 1434.58,
@@ -280,26 +282,29 @@ $(document).ready(() => {
         // wipe canvas before rendering
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.setTransform(scale, 0, 0, scale, translation.x, translation.y);
+        // darken map
         ctx.filter = `brightness(${focusedOnBuilding ? 0.5 : 1})`;
         ctx.drawImage(map, 0, 0, map.width, map.height);
+        // reset filter before drawing other images
         ctx.filter = 'none';
 
         if(focusedOnBuilding) {
             var buildingX = currentBuilding.position.x;
             var buildingY = currentBuilding.position.y;
+            if (currentFloorImage == null && currentBuilding.filename != null) {
+                for (var i = 0; i < currentBuilding.floors; i++) {
+                    let floor = new Image();
+                    const url = `/maps/${currentSchool}/${currentBuilding.filename}/${currentBuilding.filename}${i}.svg`;
+                    floor.src = url;
 
-            if (currentFloorImage == null) {
-                if(currentBuilding.filename != null) {
-                    currentFloorImage = new Image();
+                    currentFloorImages[i] = floor;
 
-                    const url = `/maps/${currentSchool}/${currentBuilding.filename}/${currentBuilding.filename}${currentFloor}.svg`;
-
-                    currentFloorImage.src = url;
+                    console.log(currentFloorImages)
                 }
             }
 
-            if (currentFloorImage != null) {
-                ctx.drawImage(currentFloorImage, buildingX, buildingY);
+            if (currentFloorImages[currentFloor] != null) {
+                ctx.drawImage(currentFloorImages[currentFloor], buildingX, buildingY);
             }
         }
 
@@ -726,7 +731,6 @@ $(document).ready(() => {
         $(this).addClass('selected-floor');
 
         currentFloor = $(this).html();
-        console.log(currentFloor);
         currentFloorImage = null;
 
         drawMap();
