@@ -16,7 +16,6 @@ $(document).ready(() => {
     let userCoords = null;
 
     let focusedOnBuilding = false;
-    let currentFloorImage = null;
 
     let currentFloorImages = {};
 
@@ -291,7 +290,7 @@ $(document).ready(() => {
         if(focusedOnBuilding) {
             var buildingX = currentBuilding.position.x;
             var buildingY = currentBuilding.position.y;
-            if (currentFloorImage == null && currentBuilding.filename != null) {
+            if (currentBuilding.filename != null) {
                 for (var i = 0; i < currentBuilding.floors; i++) {
                     let floor = new Image();
                     const url = `/maps/${currentSchool}/${currentBuilding.filename}/${currentBuilding.filename}${i}.svg`;
@@ -466,8 +465,6 @@ $(document).ready(() => {
                 if (mouseX > centeredX && mouseX < centeredX + textWidth && mouseY > y - textHeight && mouseY < y) {
                     labelName = id.replace(/^label-/, '');
                     currentBuilding = floors[currentSchool][labelName]
-
-                    currentFloorImage = null
                     
                     // clamp to a floor that exists in this building
                     currentFloor = Math.max(Math.min(currentFloor, currentBuilding.floors), currentBuilding.floorStart);
@@ -731,8 +728,6 @@ $(document).ready(() => {
         $(this).addClass('selected-floor');
 
         currentFloor = $(this).html();
-        currentFloorImage = null;
-
         drawMap();
     });
 
