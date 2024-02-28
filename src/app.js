@@ -53,6 +53,10 @@ app.get('/account', isLoggedIn, (req, res) => {
     res.render(`html/account`)
 });
 
+app.get('/about', (req, res) => {
+    res.render('html/about')
+})
+
 app.get('/logout', (req, res, next) => {
     req.logout(function(err) {
         if (err) {
